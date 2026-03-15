@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import SectionHeader from "./SectionHeader";
 
 interface ServicesSectionProps {
-  onOpenAuditForm: () => void;
+  onOpenProductForm: (productType: string) => void;
 }
 
 const services = [
@@ -14,6 +14,7 @@ const services = [
     desc: "Un site web performant conçu pour transformer les visiteurs en demandes clients.",
     features: ["Livré en 7 jours", "Optimisé SEO local", "Pensé pour convertir"],
     price: "À partir de 500 €",
+    product: "Site internet",
   },
   {
     icon: Image,
@@ -21,6 +22,7 @@ const services = [
     desc: "Des visuels et contenus marketing impactants pour améliorer votre visibilité.",
     features: ["Photos & vidéos pro", "Calendrier éditorial", "Cohérent avec votre image"],
     price: "À partir de 150 €",
+    product: "Contenu marketing",
   },
   {
     icon: BarChart3,
@@ -28,10 +30,11 @@ const services = [
     desc: "Un système simple pour capter et suivre vos prospects.",
     features: ["Gain de temps immédiat", "Fonctionnel 24h/24", "Adapté à votre activité"],
     price: "À partir de 300 €",
+    product: "Automatisation",
   },
 ];
 
-const ServicesSection = ({ onOpenAuditForm }: ServicesSectionProps) => (
+const ServicesSection = ({ onOpenProductForm }: ServicesSectionProps) => (
   <section id="services" className="section-padding">
     <div className="max-w-6xl mx-auto">
       <SectionHeader
@@ -70,7 +73,7 @@ const ServicesSection = ({ onOpenAuditForm }: ServicesSectionProps) => (
             <Button
               variant="outline"
               className="w-full border-primary/30 text-primary hover:bg-primary/10"
-              onClick={onOpenAuditForm}
+              onClick={() => onOpenProductForm(s.product)}
             >
               Demander un devis <ArrowRight className="ml-2 size-4" />
             </Button>

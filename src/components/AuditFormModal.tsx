@@ -6,11 +6,12 @@ import { Button } from "@/components/ui/button";
 interface AuditFormModalProps {
   open: boolean;
   onClose: () => void;
+  productType?: string | null;
 }
 
 const timeSlots = ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"];
 
-const AuditFormModal = ({ open, onClose }: AuditFormModalProps) => {
+const AuditFormModal = ({ open, onClose, productType }: AuditFormModalProps) => {
   const [step, setStep] = useState<"form" | "calendar" | "done">("form");
   const [form, setForm] = useState({
     nom: "", prenom: "", email: "", telephone: "",
@@ -25,14 +26,22 @@ const AuditFormModal = ({ open, onClose }: AuditFormModalProps) => {
   };
 
   const handleBook = () => {
+    const finalForm = { ...form, besoin: productType || form.besoin };
+
     const bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
-    bookings.push({ ...form, date: selectedDate, time: selectedTime, createdAt: new Date().toISOString() });
+    bookings.push({ ...finalForm, date: selectedDate, time: selectedTime, createdAt: new Date().toISOString() });
     localStorage.setItem("bookings", JSON.stringify(bookings));
 
-    // Also save to audit_requests for admin
     const requests = JSON.parse(localStorage.getItem("audit_requests") || "[]");
-    requests.push({ ...form, createdAt: new Date().toISOString() });
+    requests.push({ ...finalForm, createdAt: new Date().toISOString() });
     localStorage.setItem("audit_requests", JSON.stringify(requests));
+
+    // If from a product CTA, also save to product_requests
+    if (productType) {
+      const productRequests = JSON.parse(localStorage.getItem("product_requests") || "[]");
+      productRequests.push({ ...finalForm, product: productType, createdAt: new Date().toISOString() });
+      localStorage.setItem("product_requests", JSON.stringify(productRequests));
+    }
 
     setStep("done");
   };
@@ -45,7 +54,6 @@ const AuditFormModal = ({ open, onClose }: AuditFormModalProps) => {
     onClose();
   };
 
-  // Generate next 14 weekdays
   const dates = Array.from({ length: 21 }, (_, i) => {
     const d = new Date();
     d.setDate(d.getDate() + i + 1);
@@ -86,11 +94,16 @@ const AuditFormModal = ({ open, onClose }: AuditFormModalProps) => {
           </div>
 
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold">
-              {step === "form" && "Réserver mon audit gratuit"}
-              {step === "calendar" && "Choisir un créneau"}
-              {step === "done" && "Rendez-vous confirmé !"}
-            </h2>
+            <div>
+              <h2 className="text-xl font-bold">
+                {step === "form" && "Réserver mon audit gratuit"}
+                {step === "calendar" && "Choisir un créneau"}
+                {step === "done" && "Rendez-vous confirmé !"}
+              </h2>
+              {productType && step === "form" && (
+                <p className="text-xs text-primary mt-1">Demande pour : {productType}</p>
+              )}
+            </div>
             <button onClick={handleClose} className="text-muted-foreground hover:text-foreground transition-colors">
               <X className="size-5" />
             </button>
@@ -130,12 +143,15 @@ const AuditFormModal = ({ open, onClose }: AuditFormModalProps) => {
                   <option>Autre</option>
                 </select>
               </div>
-              <select required value={form.besoin} onChange={(e) => setForm({ ...form, besoin: e.target.value })} className="w-full bg-secondary border border-border rounded-lg px-4 py-3 text-sm text-foreground appearance-none focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
-                <option value="">Type de besoin</option>
-                <option>Site internet</option>
-                <option>Contenu marketing</option>
-                <option>Automatisation</option>
-              </select>
+              {/* Only show besoin if NOT from a product CTA */}
+              {!productType && (
+                <select required value={form.besoin} onChange={(e) => setForm({ ...form, besoin: e.target.value })} className="w-full bg-secondary border border-border rounded-lg px-4 py-3 text-sm text-foreground appearance-none focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                  <option value="">Type de besoin</option>
+                  <option>Site internet</option>
+                  <option>Contenu marketing</option>
+                  <option>Automatisation</option>
+                </select>
+              )}
               <Button type="submit" className="w-full bg-primary text-primary-foreground hover:brightness-110 py-5 rounded-xl text-base">
                 Continuer <ArrowRight className="ml-2 size-4" />
               </Button>

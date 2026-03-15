@@ -17,7 +17,17 @@ import ChatbotBubble from "@/components/ChatbotBubble";
 
 const Index = () => {
   const [auditOpen, setAuditOpen] = useState(false);
-  const openAudit = () => setAuditOpen(true);
+  const [productType, setProductType] = useState<string | null>(null);
+
+  const openAudit = () => {
+    setProductType(null);
+    setAuditOpen(true);
+  };
+
+  const openProductForm = (product: string) => {
+    setProductType(product);
+    setAuditOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -26,7 +36,7 @@ const Index = () => {
       <MetiersTicker />
       <ProblemSection />
       <SolutionsSection />
-      <ServicesSection onOpenAuditForm={openAudit} />
+      <ServicesSection onOpenProductForm={openProductForm} />
       <DiagnosticSection onOpenAuditForm={openAudit} />
       <PricingSection onOpenAuditForm={openAudit} />
       <MethodSection />
@@ -37,7 +47,7 @@ const Index = () => {
       <FinalCTA onOpenAuditForm={openAudit} />
       <MetiersTicker />
       <SiteFooter onOpenAuditForm={openAudit} />
-      <AuditFormModal open={auditOpen} onClose={() => setAuditOpen(false)} />
+      <AuditFormModal open={auditOpen} onClose={() => setAuditOpen(false)} productType={productType} />
       <ChatbotBubble />
     </div>
   );

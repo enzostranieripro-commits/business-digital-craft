@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { ArrowRight, Check, Zap, Star } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, Check, Zap, Star, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SectionHeader from "./SectionHeader";
 
@@ -56,6 +56,17 @@ const axe2 = [
   },
 ];
 
+const sectors = [
+  { id: "artisan", label: "Artisan / BTP", icon: "🔨", desc: "Plombiers, électriciens, maçons, menuisiers..." },
+  { id: "commerce", label: "Commerce", icon: "🏪", desc: "Boutiques, épiceries, fleuristes..." },
+  { id: "immobilier", label: "Immobilier", icon: "🏠", desc: "Agences immobilières, mandataires..." },
+  { id: "services", label: "Services", icon: "💼", desc: "Comptables, avocats, consultants..." },
+  { id: "tourisme", label: "Tourisme", icon: "🏔️", desc: "Hôtels, gîtes, activités..." },
+  { id: "agriculture", label: "Agriculture", icon: "🌾", desc: "Exploitants, coopératives, vente directe..." },
+  { id: "restaurant", label: "Restauration", icon: "🍽️", desc: "Restaurants, traiteurs, food trucks..." },
+  { id: "autre", label: "Autre secteur", icon: "📋", desc: "Toute activité professionnelle" },
+];
+
 const tabs = [
   { id: "web", label: "Création Web", icon: "🌐" },
   { id: "marketing", label: "Contenu Marketing", icon: "📣" },
@@ -64,6 +75,7 @@ const tabs = [
 
 const PricingSection = ({ onOpenAuditForm }: PricingSectionProps) => {
   const [activeTab, setActiveTab] = useState("web");
+  const [selectedSector, setSelectedSector] = useState<string | null>(null);
 
   const currentPlans = activeTab === "web" ? axe1 : axe2;
 
@@ -83,7 +95,7 @@ const PricingSection = ({ onOpenAuditForm }: PricingSectionProps) => {
             {tabs.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => { setActiveTab(tab.id); setSelectedSector(null); }}
                 className={`relative px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${
                   activeTab === tab.id
                     ? "bg-primary text-primary-foreground shadow-lg"
@@ -97,7 +109,7 @@ const PricingSection = ({ onOpenAuditForm }: PricingSectionProps) => {
           </div>
         </div>
 
-        {/* Plans grid */}
+        {/* Plans grid for web & marketing */}
         {activeTab !== "automation" ? (
           <motion.div
             key={activeTab}
@@ -153,50 +165,100 @@ const PricingSection = ({ onOpenAuditForm }: PricingSectionProps) => {
             ))}
           </motion.div>
         ) : (
-          <motion.div
-            key="automation"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="max-w-2xl mx-auto mb-12"
-          >
-            <div className="rounded-2xl border border-primary bg-primary/5 ring-1 ring-primary p-8 relative shadow-[0_0_60px_-15px_hsl(var(--primary)/0.3)]">
-              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                <span className="bg-primary text-primary-foreground text-xs font-bold px-5 py-1.5 rounded-full inline-flex items-center gap-1.5 shadow-lg">
-                  <Zap className="size-3" /> Système complet
-                </span>
-              </div>
-              <div className="text-center mb-8">
-                <h4 className="text-2xl font-bold mb-2">Système Client Automatisé</h4>
-                <span className="text-4xl font-extrabold tabular-nums">À partir de 990 €</span>
-              </div>
-              <div className="grid md:grid-cols-2 gap-8">
-                <div>
-                  <p className="text-sm font-semibold mb-4 text-foreground">Inclus :</p>
-                  <ul className="space-y-3">
-                    {["Automatisation des demandes", "Capture des prospects", "Dashboard de suivi", "Configuration complète"].map((f) => (
-                      <li key={f} className="flex items-center gap-2.5 text-sm text-muted-foreground">
-                        <Check className="size-4 text-primary shrink-0" /> {f}
-                      </li>
-                    ))}
-                  </ul>
+          <AnimatePresence mode="wait">
+            {!selectedSector ? (
+              <motion.div
+                key="sector-select"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4 }}
+                className="max-w-3xl mx-auto mb-12"
+              >
+                <div className="text-center mb-8">
+                  <h3 className="text-xl font-bold mb-2">Sélectionnez votre secteur d'activité</h3>
+                  <p className="text-sm text-muted-foreground">Découvrez une solution d'automatisation adaptée à votre métier</p>
                 </div>
-                <div>
-                  <p className="text-sm font-semibold mb-4 text-foreground">Adapté à votre secteur :</p>
-                  <div className="flex flex-wrap gap-2">
-                    {["Artisan", "Commerce", "Immobilier", "Services", "Tourisme", "Agriculture"].map((s) => (
-                      <span key={s} className="badge-primary">{s}</span>
-                    ))}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {sectors.map((s) => (
+                    <motion.button
+                      key={s.id}
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => setSelectedSector(s.id)}
+                      className="p-5 rounded-2xl border border-border bg-secondary/30 hover:border-primary hover:bg-primary/5 transition-all duration-200 text-center group"
+                    >
+                      <span className="text-3xl block mb-2">{s.icon}</span>
+                      <p className="text-sm font-semibold group-hover:text-primary transition-colors">{s.label}</p>
+                      <p className="text-[11px] text-muted-foreground mt-1">{s.desc}</p>
+                    </motion.button>
+                  ))}
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="automation-pricing"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4 }}
+                className="max-w-2xl mx-auto mb-12"
+              >
+                <button
+                  onClick={() => setSelectedSector(null)}
+                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
+                >
+                  <ChevronLeft className="size-4" /> Changer de secteur
+                </button>
+
+                <div className="rounded-2xl border border-primary bg-primary/5 ring-1 ring-primary p-8 relative shadow-[0_0_60px_-15px_hsl(var(--primary)/0.3)]">
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                    <span className="bg-primary text-primary-foreground text-xs font-bold px-5 py-1.5 rounded-full inline-flex items-center gap-1.5 shadow-lg">
+                      <Zap className="size-3" /> Système complet
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3 mb-6">
+                    <span className="text-2xl">{sectors.find(s => s.id === selectedSector)?.icon}</span>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Solution pour</p>
+                      <p className="font-semibold text-primary">{sectors.find(s => s.id === selectedSector)?.label}</p>
+                    </div>
+                  </div>
+
+                  <div className="text-center mb-8">
+                    <h4 className="text-2xl font-bold mb-2">Système Client Automatisé</h4>
+                    <span className="text-4xl font-extrabold tabular-nums">À partir de 990 €</span>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-8">
+                    <div>
+                      <p className="text-sm font-semibold mb-4 text-foreground">Inclus :</p>
+                      <ul className="space-y-3">
+                        {["Automatisation des demandes", "Capture des prospects", "Dashboard de suivi", "Configuration complète"].map((f) => (
+                          <li key={f} className="flex items-center gap-2.5 text-sm text-muted-foreground">
+                            <Check className="size-4 text-primary shrink-0" /> {f}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold mb-4 text-foreground">Adapté à votre secteur :</p>
+                      <div className="flex flex-wrap gap-2">
+                        {["Artisan", "Commerce", "Immobilier", "Services", "Tourisme", "Agriculture"].map((s) => (
+                          <span key={s} className={`badge-primary ${s.toLowerCase() === selectedSector ? "ring-2 ring-primary" : ""}`}>{s}</span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-center mt-8">
+                    <Button onClick={onOpenAuditForm} size="lg" className="bg-primary text-primary-foreground hover:brightness-110 rounded-xl px-8 py-5 shadow-lg">
+                      Demander un devis <ArrowRight className="ml-2 size-4" />
+                    </Button>
                   </div>
                 </div>
-              </div>
-              <div className="text-center mt-8">
-                <Button onClick={onOpenAuditForm} size="lg" className="bg-primary text-primary-foreground hover:brightness-110 rounded-xl px-8 py-5 shadow-lg">
-                  Demander un devis <ArrowRight className="ml-2 size-4" />
-                </Button>
-              </div>
-            </div>
-          </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         )}
 
         <p className="text-center text-sm text-muted-foreground max-w-xl mx-auto">
