@@ -1,12 +1,20 @@
 const metiers = [
-  "ARTISANS / BTP",
-  "COMMERCES",
-  "IMMOBILIER",
-  "SERVICES",
-  "TOURISME",
-  "AGRICULTURE",
-  "RESTAURANTS",
-  "PME LOCALES",
+  "ESPALION",
+  "MILLAU",
+  "rodez",
+  "clermont-ferrand",
+  "PARIS",
+  "LYON",
+  "CAPDENAC",
+  "MARSEILLE",
+  "SEVERAC",
+  "BARAQUEVILLE",
+  "Toulouse",
+  "RESTAURAteurs",
+  "COMMERçants",
+  "agents IMMOBILIERs",
+  "PROFESSIONS LIBÉRALES",
+  "industries",
 ];
 
 const MetiersTicker = () => {
