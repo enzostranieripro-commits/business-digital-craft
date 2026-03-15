@@ -13,6 +13,7 @@ import FAQSection from "@/components/FAQSection";
 import FinalCTA from "@/components/FinalCTA";
 import SiteFooter from "@/components/SiteFooter";
 import AuditFormModal from "@/components/AuditFormModal";
+import ChatbotBubble from "@/components/ChatbotBubble";
 
 const Index = () => {
   const [auditOpen, setAuditOpen] = useState(false);
@@ -37,6 +38,7 @@ const Index = () => {
       <MetiersTicker />
       <SiteFooter onOpenAuditForm={openAudit} />
       <AuditFormModal open={auditOpen} onClose={() => setAuditOpen(false)} />
+      <ChatbotBubble />
     </div>
   );
 };
