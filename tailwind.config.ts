@@ -14,7 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['Satoshi', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['Cabinet Grotesk', 'Satoshi', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

@@ -35,8 +35,8 @@ const services = [
 ];
 
 const ServicesSection = ({ onOpenProductForm }: ServicesSectionProps) => (
-  <section id="services" className="section-padding">
-    <div className="max-w-6xl mx-auto">
+  <section id="services" className="section-padding relative grain">
+    <div className="max-w-6xl mx-auto relative z-10">
       <SectionHeader
         label="NOS SERVICES"
         title="Trois leviers pour"
@@ -51,32 +51,38 @@ const ServicesSection = ({ onOpenProductForm }: ServicesSectionProps) => (
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="card-surface-hover p-6 flex flex-col"
+            transition={{ duration: 0.5, delay: i * 0.12, ease: [0.16, 1, 0.3, 1] }}
+            className="group card-surface-hover p-6 flex flex-col relative overflow-hidden"
           >
-            <div className="flex items-center justify-between mb-6">
-              <div className="size-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <s.icon className="size-5 text-primary" />
+            {/* Hover gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+            <div className="relative z-10 flex flex-col flex-1">
+              <div className="flex items-center justify-between mb-6">
+                <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/10 group-hover:border-primary/30 transition-colors duration-300">
+                  <s.icon className="size-5 text-primary" />
+                </div>
+                <span className="badge-primary">{s.price}</span>
               </div>
-              <span className="badge-primary">{s.price}</span>
+              <h3 className="text-lg font-display font-bold mb-3">{s.title}</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed mb-5">{s.desc}</p>
+              <ul className="space-y-2.5 mb-6 flex-1">
+                {s.features.map((f) => (
+                  <li key={f} className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <span className="size-1.5 rounded-full bg-primary/60" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <Button
+                variant="outline"
+                className="w-full border-primary/30 text-primary hover:bg-primary/10 rounded-xl group/btn transition-all duration-300"
+                onClick={() => onOpenProductForm(s.product)}
+              >
+                Demander un devis
+                <ArrowRight className="ml-2 size-4 transition-transform group-hover/btn:translate-x-1" />
+              </Button>
             </div>
-            <h3 className="text-lg font-semibold mb-3">{s.title}</h3>
-            <p className="text-muted-foreground text-sm leading-relaxed mb-5">{s.desc}</p>
-            <ul className="space-y-2 mb-6 flex-1">
-              {s.features.map((f) => (
-                <li key={f} className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <span className="size-1.5 rounded-full bg-primary/60" />
-                  {f}
-                </li>
-              ))}
-            </ul>
-            <Button
-              variant="outline"
-              className="w-full border-primary/30 text-primary hover:bg-primary/10"
-              onClick={() => onOpenProductForm(s.product)}
-            >
-              Demander un devis <ArrowRight className="ml-2 size-4" />
-            </Button>
           </motion.div>
         ))}
       </div>
@@ -89,9 +95,10 @@ const ServicesSection = ({ onOpenProductForm }: ServicesSectionProps) => (
       >
         <button
           onClick={() => document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" })}
-          className="text-primary text-sm hover:underline inline-flex items-center gap-1"
+          className="group text-primary text-sm hover:underline inline-flex items-center gap-1"
         >
-          Voir tous nos services et tarifs détaillés <ArrowRight className="size-3" />
+          Voir tous nos services et tarifs détaillés
+          <ArrowRight className="size-3 transition-transform group-hover:translate-x-1" />
         </button>
       </motion.div>
     </div>

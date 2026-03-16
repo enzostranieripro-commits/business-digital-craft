@@ -15,8 +15,10 @@ const SectionHeader = ({ label, title, highlight, description }: SectionHeaderPr
     transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
     className="text-center mb-16"
   >
-    <span className="text-primary text-sm font-semibold uppercase tracking-widest">{label}</span>
-    <h2 className="text-3xl md:text-5xl font-bold mt-4 mb-6" style={{ textWrap: "balance" as any }}>
+    <span className="inline-flex items-center gap-2 text-primary text-xs font-semibold uppercase tracking-[0.2em] bg-primary/5 border border-primary/10 rounded-full px-4 py-1.5">
+      {label}
+    </span>
+    <h2 className="text-3xl md:text-5xl font-display font-black mt-6 mb-6 tracking-tight" style={{ textWrap: "balance" as any }}>
       {title} <span className="text-gradient">{highlight}</span>
     </h2>
     {description && (

@@ -9,8 +9,11 @@ const steps = [
 ];
 
 const MethodSection = () => (
-  <section className="section-padding">
-    <div className="max-w-6xl mx-auto">
+  <section className="section-padding relative">
+    {/* Connecting line */}
+    <div className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 w-[60%] h-px divider-glow" />
+
+    <div className="max-w-6xl mx-auto relative z-10">
       <SectionHeader
         label="NOTRE MÉTHODE"
         title="Un accompagnement"
@@ -25,18 +28,21 @@ const MethodSection = () => (
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="card-surface-hover p-6"
+            transition={{ duration: 0.5, delay: i * 0.15, ease: [0.16, 1, 0.3, 1] }}
+            className="group card-surface-hover p-6 relative overflow-hidden"
           >
-            <div className="flex items-center justify-between mb-5">
-              <div className="size-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <s.icon className="size-5 text-primary" />
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-5">
+                <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/10 group-hover:border-primary/30 transition-colors duration-300">
+                  <s.icon className="size-5 text-primary" />
+                </div>
+                <span className="text-5xl font-display font-black text-muted-foreground/10 group-hover:text-primary/10 transition-colors duration-500">{s.num}</span>
               </div>
-              <span className="text-4xl font-bold text-muted-foreground/20 tabular-nums">{s.num}</span>
+              <h3 className="text-lg font-display font-bold mb-3">{s.title}</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed mb-4">{s.desc}</p>
+              <p className="text-primary text-sm font-medium">{s.highlight}</p>
             </div>
-            <h3 className="text-lg font-semibold mb-3">{s.title}</h3>
-            <p className="text-muted-foreground text-sm leading-relaxed mb-4">{s.desc}</p>
-            <p className="text-primary text-sm">{s.highlight}</p>
           </motion.div>
         ))}
       </div>

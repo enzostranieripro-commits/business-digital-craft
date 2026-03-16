@@ -7,10 +7,12 @@ interface FinalCTAProps {
 }
 
 const FinalCTA = ({ onOpenAuditForm }: FinalCTAProps) => (
-  <section className="section-padding relative overflow-hidden">
+  <section className="section-padding relative overflow-hidden grain">
+    {/* Gradient orbs */}
     <div className="absolute inset-0 flex items-center justify-center">
-      <div className="w-[500px] h-[500px] rounded-full opacity-15 blur-[150px]" style={{ background: "hsl(var(--primary))" }} />
+      <div className="w-[600px] h-[600px] rounded-full opacity-15 blur-[180px] animate-float" style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(300 80% 60%))" }} />
     </div>
+    <div className="absolute top-0 right-0 w-[300px] h-[300px] rounded-full opacity-10 blur-[120px]" style={{ background: "hsl(var(--premium-gold))" }} />
 
     <div className="relative z-10 max-w-2xl mx-auto text-center">
       <motion.div
@@ -22,7 +24,7 @@ const FinalCTA = ({ onOpenAuditForm }: FinalCTAProps) => (
           <Gift className="size-3" /> Audit offert — Places limitées chaque mois
         </span>
 
-        <h2 className="text-3xl md:text-5xl font-bold mt-6 mb-6" style={{ textWrap: "balance" as any }}>
+        <h2 className="text-3xl md:text-5xl font-display font-black mt-6 mb-6 tracking-tight" style={{ textWrap: "balance" as any }}>
           Prêt à développer <span className="text-gradient">votre activité ?</span>
         </h2>
 
@@ -37,7 +39,7 @@ const FinalCTA = ({ onOpenAuditForm }: FinalCTAProps) => (
             "Une estimation de budget transparente",
             "Aucun engagement, aucune obligation",
           ].map((item) => (
-            <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
+            <li key={item} className="flex items-start gap-2.5 text-sm text-muted-foreground">
               <CheckCircle className="size-4 text-primary mt-0.5 shrink-0" /> {item}
             </li>
           ))}
@@ -45,10 +47,11 @@ const FinalCTA = ({ onOpenAuditForm }: FinalCTAProps) => (
 
         <Button
           size="lg"
-          className="bg-primary text-primary-foreground hover:brightness-110 px-10 py-6 text-base rounded-xl glow-subtle"
+          className="group bg-primary text-primary-foreground hover:brightness-110 px-10 py-6 text-base rounded-xl animate-pulse-glow transition-all duration-300"
           onClick={onOpenAuditForm}
         >
-          Réserver mon audit gratuit <ArrowRight className="ml-2 size-4" />
+          Réserver mon audit gratuit
+          <ArrowRight className="ml-2 size-4 transition-transform group-hover:translate-x-1" />
         </Button>
 
         <p className="text-xs text-muted-foreground mt-4 flex items-center justify-center gap-2">
