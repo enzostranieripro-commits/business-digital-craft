@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Check, Zap, Star, ChevronLeft } from "lucide-react";
+import { ArrowRight, Check, Zap, Star, ChevronLeft, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SectionHeader from "./SectionHeader";
 
@@ -57,14 +57,86 @@ const axe2 = [
 ];
 
 const sectors = [
-  { id: "artisan", label: "Artisan / BTP", icon: "🔨", desc: "Plombiers, électriciens, maçons, menuisiers..." },
-  { id: "commerce", label: "Commerce", icon: "🏪", desc: "Boutiques, épiceries, fleuristes..." },
-  { id: "immobilier", label: "Immobilier", icon: "🏠", desc: "Agences immobilières, mandataires..." },
-  { id: "services", label: "Services", icon: "💼", desc: "Comptables, avocats, consultants..." },
-  { id: "tourisme", label: "Tourisme", icon: "🏔️", desc: "Hôtels, gîtes, activités..." },
-  { id: "agriculture", label: "Agriculture", icon: "🌾", desc: "Exploitants, coopératives, vente directe..." },
-  { id: "restaurant", label: "Restauration", icon: "🍽️", desc: "Restaurants, traiteurs, food trucks..." },
-  { id: "autre", label: "Autre secteur", icon: "📋", desc: "Toute activité professionnelle" },
+  {
+    id: "artisan",
+    label: "Artisan / BTP",
+    icon: "🔨",
+    desc: "Plombiers, électriciens, maçons, menuisiers...",
+    tasks: [
+      { title: "Relance devis automatique", detail: "Envoi automatique d'un SMS/email de relance 48h après chaque devis non signé." },
+      { title: "Fiche chantier hebdo", detail: "Génération automatique d'un récapitulatif chantier chaque vendredi pour chaque client actif." },
+    ],
+  },
+  {
+    id: "commerce",
+    label: "Commerce",
+    icon: "🏪",
+    desc: "Boutiques, épiceries, fleuristes...",
+    tasks: [
+      { title: "Alerte stock bas", detail: "Notification automatique quand un produit passe sous le seuil minimum défini." },
+      { title: "Email fidélité mensuel", detail: "Envoi automatique d'une offre personnalisée aux clients n'ayant pas commandé depuis 30 jours." },
+    ],
+  },
+  {
+    id: "immobilier",
+    label: "Immobilier",
+    icon: "🏠",
+    desc: "Agences immobilières, mandataires...",
+    tasks: [
+      { title: "Matching acheteur/bien", detail: "Alerte automatique aux acheteurs inscrits dès qu'un bien correspond à leurs critères." },
+      { title: "Rapport vendeur hebdo", detail: "Rapport automatisé envoyé chaque semaine au propriétaire : vues, contacts, retours marché." },
+    ],
+  },
+  {
+    id: "services",
+    label: "Services",
+    icon: "💼",
+    desc: "Comptables, avocats, consultants...",
+    tasks: [
+      { title: "Rappel rendez-vous client", detail: "SMS/email automatique 24h avant chaque rendez-vous pour réduire les absences." },
+      { title: "Relance facture impayée", detail: "Envoi automatique d'une relance polie à J+7 et J+14 après une facture non réglée." },
+    ],
+  },
+  {
+    id: "tourisme",
+    label: "Tourisme",
+    icon: "🏔️",
+    desc: "Hôtels, gîtes, activités...",
+    tasks: [
+      { title: "Message de bienvenue", detail: "Envoi automatique des infos pratiques (accès, WiFi, recommandations) à la confirmation de réservation." },
+      { title: "Demande d'avis post-séjour", detail: "Email automatique 24h après le départ pour inviter le client à laisser un avis Google." },
+    ],
+  },
+  {
+    id: "agriculture",
+    label: "Agriculture",
+    icon: "🌾",
+    desc: "Exploitants, coopératives, vente directe...",
+    tasks: [
+      { title: "Bon de commande hebdo", detail: "Récapitulatif automatique des commandes de la semaine envoyé chaque lundi matin." },
+      { title: "Alerte météo culture", detail: "Notification ciblée en cas de gel ou forte pluie prévue dans les 48h sur votre zone." },
+    ],
+  },
+  {
+    id: "restaurant",
+    label: "Restauration",
+    icon: "🍽️",
+    desc: "Restaurants, traiteurs, food trucks...",
+    tasks: [
+      { title: "Confirmation réservation auto", detail: "SMS de confirmation immédiat + rappel la veille pour chaque réservation en ligne." },
+      { title: "Collecte d'avis post-repas", detail: "Message automatique envoyé 2h après le service pour recueillir l'avis du client." },
+    ],
+  },
+  {
+    id: "autre",
+    label: "Autre secteur",
+    icon: "📋",
+    desc: "Toute activité professionnelle",
+    tasks: [
+      { title: "Suivi prospect automatisé", detail: "Séquence d'emails de nurturing envoyée automatiquement après chaque nouvelle demande." },
+      { title: "Rapport d'activité mensuel", detail: "Synthèse automatique des indicateurs clés envoyée le 1er de chaque mois." },
+    ],
+  },
 ];
 
 const tabs = [
@@ -78,6 +150,7 @@ const PricingSection = ({ onOpenAuditForm }: PricingSectionProps) => {
   const [selectedSector, setSelectedSector] = useState<string | null>(null);
 
   const currentPlans = activeTab === "web" ? axe1 : axe2;
+  const currentSector = sectors.find((s) => s.id === selectedSector);
 
   return (
     <section id="pricing" className="section-padding">
@@ -177,7 +250,9 @@ const PricingSection = ({ onOpenAuditForm }: PricingSectionProps) => {
               >
                 <div className="text-center mb-8">
                   <h3 className="text-xl font-bold mb-2">Sélectionnez votre secteur d'activité</h3>
-                  <p className="text-sm text-muted-foreground">Découvrez une solution d'automatisation adaptée à votre métier</p>
+                  <p className="text-sm text-muted-foreground">
+                    Découvrez les automatisations concrètes prévues pour votre métier
+                  </p>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {sectors.map((s) => (
@@ -219,10 +294,10 @@ const PricingSection = ({ onOpenAuditForm }: PricingSectionProps) => {
                   </div>
 
                   <div className="flex items-center gap-3 mb-6">
-                    <span className="text-2xl">{sectors.find(s => s.id === selectedSector)?.icon}</span>
+                    <span className="text-2xl">{currentSector?.icon}</span>
                     <div>
                       <p className="text-xs text-muted-foreground">Solution pour</p>
-                      <p className="font-semibold text-primary">{sectors.find(s => s.id === selectedSector)?.label}</p>
+                      <p className="font-semibold text-primary">{currentSector?.label}</p>
                     </div>
                   </div>
 
@@ -230,28 +305,68 @@ const PricingSection = ({ onOpenAuditForm }: PricingSectionProps) => {
                     <h4 className="text-2xl font-bold mb-2">Système Client Automatisé</h4>
                     <span className="text-4xl font-extrabold tabular-nums">À partir de 990 €</span>
                   </div>
-                  <div className="grid md:grid-cols-2 gap-8">
-                    <div>
-                      <p className="text-sm font-semibold mb-4 text-foreground">Inclus :</p>
-                      <ul className="space-y-3">
-                        {["Automatisation des demandes", "Capture des prospects", "Dashboard de suivi", "Configuration complète"].map((f) => (
+
+                  <div className="space-y-6">
+                    {/* Dashboard de suivi */}
+                    <div className="rounded-xl bg-primary/10 border border-primary/20 p-5">
+                      <div className="flex items-center gap-2 mb-3">
+                        <LayoutDashboard className="size-4 text-primary" />
+                        <p className="text-sm font-bold text-primary">Dashboard de suivi inclus</p>
+                      </div>
+                      <ul className="space-y-2">
+                        {["Vue en temps réel de vos prospects", "Suivi des automatisations actives", "Tableau de bord personnalisé à votre activité", "Configuration complète incluse"].map((f) => (
                           <li key={f} className="flex items-center gap-2.5 text-sm text-muted-foreground">
                             <Check className="size-4 text-primary shrink-0" /> {f}
                           </li>
                         ))}
                       </ul>
                     </div>
+
+                    {/* Tâches récurrentes par métier */}
                     <div>
-                      <p className="text-sm font-semibold mb-4 text-foreground">Adapté à votre secteur :</p>
-                      <div className="flex flex-wrap gap-2">
-                        {["Artisan", "Commerce", "Immobilier", "Services", "Tourisme", "Agriculture"].map((s) => (
-                          <span key={s} className={`badge-primary ${s.toLowerCase() === selectedSector ? "ring-2 ring-primary" : ""}`}>{s}</span>
+                      <p className="text-sm font-bold mb-3 text-foreground">
+                        2 automatisations clés pour votre métier :
+                      </p>
+                      <div className="space-y-3">
+                        {currentSector?.tasks.map((task, i) => (
+                          <motion.div
+                            key={task.title}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: i * 0.1 }}
+                            className="rounded-xl border border-border bg-secondary/40 p-4"
+                          >
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="w-5 h-5 rounded-full bg-primary/20 text-primary text-[10px] font-bold flex items-center justify-center">
+                                {i + 1}
+                              </span>
+                              <p className="text-sm font-semibold">{task.title}</p>
+                            </div>
+                            <p className="text-xs text-muted-foreground pl-7">{task.detail}</p>
+                          </motion.div>
                         ))}
                       </div>
                     </div>
+
+                    {/* Capture des prospects */}
+                    <div>
+                      <p className="text-sm font-semibold mb-3 text-foreground">Également inclus :</p>
+                      <ul className="space-y-2">
+                        {["Capture automatique des prospects", "Notifications en temps réel"].map((f) => (
+                          <li key={f} className="flex items-center gap-2.5 text-sm text-muted-foreground">
+                            <Check className="size-4 text-primary shrink-0" /> {f}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
+
                   <div className="text-center mt-8">
-                    <Button onClick={onOpenAuditForm} size="lg" className="bg-primary text-primary-foreground hover:brightness-110 rounded-xl px-8 py-5 shadow-lg">
+                    <Button
+                      onClick={onOpenAuditForm}
+                      size="lg"
+                      className="bg-primary text-primary-foreground hover:brightness-110 rounded-xl px-8 py-5 shadow-lg"
+                    >
                       Demander un devis <ArrowRight className="ml-2 size-4" />
                     </Button>
                   </div>
