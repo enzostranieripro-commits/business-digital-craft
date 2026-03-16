@@ -1,307 +1,150 @@
-import { useState, useEffect, useMemo, useRef } from "react";
-import {
-  ArrowLeft,
-  Phone,
-  ClipboardList,
-  BarChart3,
-  Users,
-  TrendingUp,
-  Clock,
-  MousePointerClick,
-  ChevronLeft,
-  Package,
-  Globe,
-  Camera,
-  Zap,
-  ArrowUpRight,
-  Activity,
-  Star,
-  LogOut,
-  Search,
-  ShieldCheck,
-} from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { ArrowLeft, Phone, Calendar, ClipboardList, BarChart3, Users, TrendingUp, Clock, Eye, MousePointerClick, ChevronLeft, Package, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
-const ADMIN_PASSWORD = "projetia12";
+interface DiagnosticEntry {
+  answers: string[];
+  date: string;
+}
 
-interface DiagnosticEntry { answers: string[]; date: string }
-interface AuditRequest { nom: string; prenom: string; email: string; telephone: string; secteur: string; besoin: string; createdAt: string }
-interface ProductRequest { nom: string; prenom: string; email: string; telephone: string; secteur: string; product: string; createdAt: string }
-type TabId = "overview" | "audit_requests" | "diagnostics" | "product_requests";
+interface BookingEntry {
+  nom: string;
+  prenom: string;
+  email: string;
+  telephone: string;
+  secteur: string;
+  besoin: string;
+  date: string;
+  time: string;
+  createdAt: string;
+}
 
-const AnimatedNumber = ({ value, suffix = "" }: { value: number; suffix?: string }) => {
-  const [display, setDisplay] = useState(0);
-  const ref = useRef<ReturnType<typeof setInterval> | null>(null);
-  useEffect(() => {
-    setDisplay(0);
-    let start = 0;
-    const steps = 40;
-    const increment = value / steps;
-    ref.current = setInterval(() => {
-      start += increment;
-      if (start >= value) { setDisplay(value); if (ref.current) clearInterval(ref.current); }
-      else setDisplay(Math.floor(start));
-    }, 1200 / steps);
-    return () => { if (ref.current) clearInterval(ref.current); };
-  }, [value]);
-  return <span>{display}{suffix}</span>;
-};
+interface AuditRequest {
+  nom: string;
+  prenom: string;
+  email: string;
+  telephone: string;
+  secteur: string;
+  besoin: string;
+  createdAt: string;
+}
 
-const Bar = ({ pct, color = "bg-primary" }: { pct: number; color?: string }) => {
-  const [width, setWidth] = useState(0);
-  useEffect(() => { const t = setTimeout(() => setWidth(pct), 100); return () => clearTimeout(t); }, [pct]);
-  return (
-    <div className="h-2 bg-border rounded-full overflow-hidden">
-      <div className={`h-full ${color} rounded-full transition-all duration-1000 ease-out`} style={{ width: `${width}%` }} />
-    </div>
-  );
-};
+interface ProductRequest {
+  nom: string;
+  prenom: string;
+  email: string;
+  telephone: string;
+  secteur: string;
+  product: string;
+  createdAt: string;
+}
 
-const productFamilies = [
-  { key: "Site internet", label: "Création Web", icon: Globe, color: "text-blue-400", bg: "bg-blue-400/10", border: "border-blue-400/20" },
-  { key: "Contenu marketing", label: "Contenu Marketing", icon: Camera, color: "text-purple-400", bg: "bg-purple-400/10", border: "border-purple-400/20" },
-  { key: "Automatisation", label: "Automatisation", icon: Zap, color: "text-amber-400", bg: "bg-amber-400/10", border: "border-amber-400/20" },
-];
+type TabId = "overview" | "audit_requests" | "diagnostics" | "rdv" | "product_requests";
 
-const DonutChart = ({ data }: { data: { label: string; value: number; color: string }[] }) => {
-  const total = data.reduce((a, b) => a + b.value, 0);
-  if (total === 0) return <p className="text-sm text-muted-foreground text-center py-8">Aucune donnée</p>;
-  let cumAngle = -90;
-  const r = 72; const cx = 90; const cy = 90;
-  const slices = data.map((d) => {
-    const angle = (d.value / total) * 360;
-    const startRad = (cumAngle * Math.PI) / 180;
-    const endRad = ((cumAngle + angle) * Math.PI) / 180;
-    cumAngle += angle;
-    const x1 = cx + r * Math.cos(startRad); const y1 = cy + r * Math.sin(startRad);
-    const x2 = cx + r * Math.cos(endRad); const y2 = cy + r * Math.sin(endRad);
-    const large = angle > 180 ? 1 : 0;
-    const path = data.length === 1
-      ? `M${cx},${cy - r} A${r},${r} 0 1,1 ${cx - 0.01},${cy - r} Z`
-      : `M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${large},1 ${x2},${y2} Z`;
-    return { ...d, path };
-  });
-  return (
-    <div className="flex flex-col items-center gap-4">
-      <svg width="180" height="180" viewBox="0 0 180 180">
-        {slices.map((s) => <path key={s.label} d={s.path} fill={s.color} opacity={0.85} />)}
-        <circle cx={cx} cy={cy} r="42" fill="hsl(var(--background))" />
-        <text x={cx} y={cy - 6} textAnchor="middle" fill="hsl(var(--foreground))" fontSize="22" fontWeight="bold">{total}</text>
-        <text x={cx} y={cy + 12} textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="9">demandes</text>
-      </svg>
-      <div className="flex flex-wrap gap-3 justify-center">
-        {slices.map((s) => (
-          <div key={s.label} className="flex items-center gap-1.5 text-xs">
-            <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: s.color }} />
-            <span className="text-muted-foreground">{s.label}</span>
-            <span className="font-bold">{s.value}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-/* ══════ LOGIN SCREEN ══════ */
-const LoginScreen = ({ onSuccess }: { onSuccess: () => void }) => {
-  const [pwd, setPwd] = useState("");
-  const [masked, setMasked] = useState(true);
-  const [error, setError] = useState(false);
-  const [attempts, setAttempts] = useState(0);
-
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (pwd === ADMIN_PASSWORD) {
-      onSuccess();
-    } else {
-      setAttempts(a => a + 1);
-      setError(true);
-      setPwd("");
-      setTimeout(() => setError(false), 3000);
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: "radial-gradient(ellipse 60% 50% at 50% 40%, hsl(var(--primary) / 0.08) 0%, transparent 70%)"
-        }}
-      />
-      <div
-        className="w-full max-w-sm relative"
-        style={error ? { animation: "adminShake 0.4s ease-in-out" } : {}}
-      >
-        <style>{`
-          @keyframes adminShake {
-            0%,100%{transform:translateX(0)}
-            20%{transform:translateX(-10px)}
-            40%{transform:translateX(10px)}
-            60%{transform:translateX(-6px)}
-            80%{transform:translateX(6px)}
-          }
-        `}</style>
-
-        <div className="rounded-2xl border border-border bg-card p-8 shadow-xl">
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-4">
-              <ShieldCheck className="size-8 text-primary" />
-            </div>
-            <h1 className="text-xl font-bold">Studio Nova</h1>
-            <p className="text-sm text-muted-foreground mt-1">Espace administration</p>
-          </div>
-
-          <form onSubmit={submit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                Mot de passe
-              </label>
-              <div className="relative">
-                <input
-                  type={masked ? "password" : "text"}
-                  value={pwd}
-                  onChange={e => setPwd(e.target.value)}
-                  placeholder="••••••••••"
-                  autoFocus
-                  autoComplete="current-password"
-                  className={[
-                    "w-full rounded-xl border px-4 py-3 pr-11 text-sm bg-secondary text-foreground",
-                    "placeholder:text-muted-foreground outline-none transition-all",
-                    error
-                      ? "border-red-500 ring-1 ring-red-500/30"
-                      : "border-border focus:border-primary focus:ring-1 focus:ring-primary/30"
-                  ].join(" ")}
-                />
-                <button
-                  type="button"
-                  onClick={() => setMasked(m => !m)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors text-xs font-medium px-1"
-                >
-                  {masked ? "voir" : "cacher"}
-                </button>
-              </div>
-              {error && (
-                <p className="text-xs text-red-400 mt-2 text-center">
-                  Mot de passe incorrect{attempts > 1 ? ` (${attempts} essais)` : ""}.
-                </p>
-              )}
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full rounded-xl py-5 bg-primary text-primary-foreground hover:brightness-110 font-semibold"
-            >
-              <ShieldCheck className="size-4 mr-2" />
-              Accéder au dashboard
-            </Button>
-          </form>
-
-          <p className="text-center text-xs text-muted-foreground mt-6">
-            Accès réservé à l'équipe Studio Nova
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-/* ══════ MAIN ADMIN ══════ */
 const Admin = () => {
   const navigate = useNavigate();
-  const [authenticated, setAuthenticated] = useState(false);
   const [tab, setTab] = useState<TabId>("overview");
   const [diagnostics, setDiagnostics] = useState<DiagnosticEntry[]>([]);
+  const [bookings, setBookings] = useState<BookingEntry[]>([]);
   const [auditRequests, setAuditRequests] = useState<AuditRequest[]>([]);
   const [productRequests, setProductRequests] = useState<ProductRequest[]>([]);
   const [selectedAudit, setSelectedAudit] = useState<AuditRequest | null>(null);
   const [selectedDiagnostic, setSelectedDiagnostic] = useState<DiagnosticEntry | null>(null);
-  const [productFilter, setProductFilter] = useState("all");
+  const [productFilter, setProductFilter] = useState<string>("all");
 
   useEffect(() => {
-    if (!authenticated) return;
     setDiagnostics(JSON.parse(localStorage.getItem("diagnostics") || "[]"));
+    setBookings(JSON.parse(localStorage.getItem("bookings") || "[]"));
     setAuditRequests(JSON.parse(localStorage.getItem("audit_requests") || "[]"));
     setProductRequests(JSON.parse(localStorage.getItem("product_requests") || "[]"));
-  }, [authenticated]);
-
-  if (!authenticated) return <LoginScreen onSuccess={() => setAuthenticated(true)} />;
+  }, []);
 
   const tabs = [
     { id: "overview" as const, label: "Vue d'ensemble", icon: BarChart3 },
     { id: "audit_requests" as const, label: "Demandes Audits", icon: ClipboardList },
     { id: "diagnostics" as const, label: "Diagnostics", icon: Users },
+    { id: "rdv" as const, label: "RDV", icon: Calendar },
     { id: "product_requests" as const, label: "Demandes Produits", icon: Package },
   ];
 
+  // KPIs
   const totalLeads = auditRequests.length + diagnostics.length;
-  const conversionRate = totalLeads > 0 ? Math.round((auditRequests.length / totalLeads) * 100) : 0;
-  const todayLeads = auditRequests.filter(r => new Date(r.createdAt).toDateString() === new Date().toDateString()).length;
+  const totalBookings = bookings.length;
+  const conversionRate = totalLeads > 0 ? Math.round((totalBookings / totalLeads) * 100) : 0;
+  const todayBookings = bookings.filter(b => {
+    const d = new Date(b.createdAt);
+    const today = new Date();
+    return d.toDateString() === today.toDateString();
+  }).length;
 
+  // Sectors breakdown
   const sectorCounts: Record<string, number> = {};
-  auditRequests.forEach(r => { sectorCounts[r.secteur || "Inconnu"] = (sectorCounts[r.secteur || "Inconnu"] || 0) + 1; });
+  [...auditRequests, ...diagnostics.map(d => ({ secteur: d.answers[0] || "Inconnu" }))].forEach(item => {
+    const s = ('secteur' in item ? item.secteur : "Inconnu") || "Inconnu";
+    sectorCounts[s] = (sectorCounts[s] || 0) + 1;
+  });
 
-  const productCountsForDonut = useMemo(() => {
-    const list = productFilter === "all" ? productRequests : productRequests.filter(p => p.product === productFilter);
-    const c: Record<string, number> = {};
-    list.forEach(p => { c[p.product] = (c[p.product] || 0) + 1; });
-    return c;
+  const besoinCounts: Record<string, number> = {};
+  auditRequests.forEach(r => {
+    besoinCounts[r.besoin] = (besoinCounts[r.besoin] || 0) + 1;
+  });
+
+  // Product request pie chart data
+  const productCounts = useMemo(() => {
+    const filtered = productFilter === "all" ? productRequests : productRequests.filter(p => p.product === productFilter);
+    const counts: Record<string, number> = {};
+    filtered.forEach(p => {
+      counts[p.product] = (counts[p.product] || 0) + 1;
+    });
+    return counts;
   }, [productRequests, productFilter]);
 
-  const donutData = productFamilies.map((f, i) => ({
-    label: f.label,
-    value: productCountsForDonut[f.key] || 0,
-    color: ["hsl(210,70%,55%)", "hsl(270,60%,60%)", "hsl(45,90%,55%)"][i],
-  }));
+  const pieColors = ["hsl(var(--primary))", "hsl(210, 70%, 55%)", "hsl(150, 60%, 45%)"];
+  const totalProductRequests = Object.values(productCounts).reduce((a, b) => a + b, 0);
 
-  const diagQuestions = ["Secteur d'activité", "Site internet", "Demandes clients", "Réseaux sociaux", "Tâches répétitives"];
+  // RDV calendar grouping
+  const bookingsByDate = useMemo(() => {
+    const grouped: Record<string, BookingEntry[]> = {};
+    bookings.forEach(b => {
+      if (!grouped[b.date]) grouped[b.date] = [];
+      grouped[b.date].push(b);
+    });
+    return Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b));
+  }, [bookings]);
 
-  const recentActivity = [
-    ...auditRequests.map(a => ({ type: "Audit", name: `${a.prenom} ${a.nom}`, detail: a.secteur, date: a.createdAt, color: "bg-blue-500/20 text-blue-400" })),
-    ...productRequests.map(p => ({ type: p.product, name: `${p.prenom} ${p.nom}`, detail: p.secteur, date: p.createdAt, color: "bg-primary/20 text-primary" })),
-  ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 6);
-
-  const logout = () => { setAuthenticated(false); setTab("overview"); setSelectedAudit(null); setSelectedDiagnostic(null); };
+  const diagQuestions = [
+    "Secteur d'activité",
+    "Site internet",
+    "Demandes clients",
+    "Réseaux sociaux",
+    "Tâches répétitives",
+  ];
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <div className="border-b border-border/50 px-6 py-4 flex items-center justify-between backdrop-blur sticky top-0 z-10 bg-background/80">
+      <div className="border-b border-border px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
             <ArrowLeft className="size-4 mr-2" /> Retour
           </Button>
-          <div className="h-4 w-px bg-border" />
-          <div className="flex items-center gap-2">
-            <Activity className="size-4 text-primary" />
-            <h1 className="text-base font-bold">Dashboard Admin</h1>
-          </div>
+          <h1 className="text-lg font-bold">Dashboard Admin</h1>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-xs text-muted-foreground hidden sm:block">Studio Nova — Live</span>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={logout}
-            className="rounded-xl text-muted-foreground hover:text-red-400 hover:border-red-400/40 transition-all"
-          >
-            <LogOut className="size-3.5 mr-1.5" /> Déconnexion
-          </Button>
-        </div>
+        <span className="text-xs text-muted-foreground">Studio Nova — Panel</span>
       </div>
 
       <div className="max-w-7xl mx-auto p-6">
         {/* Tabs */}
         <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
-          {tabs.map(t => (
-            <button key={t.id}
+          {tabs.map((t) => (
+            <button
+              key={t.id}
               onClick={() => { setTab(t.id); setSelectedAudit(null); setSelectedDiagnostic(null); }}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
-                tab === t.id ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" : "bg-secondary/50 text-muted-foreground hover:text-foreground hover:bg-secondary"
+                tab === t.id
+                  ? "bg-primary text-primary-foreground shadow-lg"
+                  : "bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80"
               }`}
             >
               <t.icon className="size-4" /> {t.label}
@@ -309,111 +152,109 @@ const Admin = () => {
           ))}
         </div>
 
-        {/* OVERVIEW */}
+        {/* ===== OVERVIEW ===== */}
         {tab === "overview" && (
           <div className="space-y-8">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {[
-                { label: "Total Leads", value: totalLeads, icon: Users, color: "text-blue-400", bg: "from-blue-500/10", suffix: "" },
-                { label: "Demandes Audit", value: auditRequests.length, icon: ClipboardList, color: "text-primary", bg: "from-primary/10", suffix: "" },
-                { label: "Taux conversion", value: conversionRate, icon: TrendingUp, color: "text-green-400", bg: "from-green-500/10", suffix: "%" },
-                { label: "Nouveaux today", value: todayLeads, icon: Clock, color: "text-amber-400", bg: "from-amber-500/10", suffix: "" },
-              ].map(kpi => (
-                <div key={kpi.label} className={`relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br ${kpi.bg} to-transparent p-5`}>
-                  <div className="flex items-center justify-between mb-4">
+                { label: "Total Leads", value: totalLeads, icon: Users, color: "text-blue-400" },
+                { label: "RDV Réservés", value: totalBookings, icon: Calendar, color: "text-primary" },
+                { label: "Taux conversion", value: `${conversionRate}%`, icon: TrendingUp, color: "text-green-400" },
+                { label: "RDV Aujourd'hui", value: todayBookings, icon: Clock, color: "text-orange-400" },
+              ].map((kpi) => (
+                <div key={kpi.label} className="card-surface p-5">
+                  <div className="flex items-center justify-between mb-3">
                     <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{kpi.label}</span>
                     <kpi.icon className={`size-4 ${kpi.color}`} />
                   </div>
-                  <p className={`text-4xl font-black tabular-nums ${kpi.color}`}>
-                    <AnimatedNumber value={kpi.value} suffix={kpi.suffix} />
-                  </p>
+                  <p className="text-3xl font-bold tabular-nums">{kpi.value}</p>
                 </div>
               ))}
             </div>
 
-            <div>
-              <h3 className="text-sm font-semibold mb-4 flex items-center gap-2">
-                <Star className="size-4 text-primary" /> Demandes par famille de produit
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {productFamilies.map(f => {
-                  const count = productRequests.filter(p => p.product === f.key).length;
-                  const pct = productRequests.length > 0 ? Math.round((count / productRequests.length) * 100) : 0;
-                  return (
-                    <div key={f.key} className={`rounded-2xl border ${f.border} ${f.bg} p-5 flex flex-col gap-3`}>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className={`w-8 h-8 rounded-xl ${f.bg} border ${f.border} flex items-center justify-center`}>
-                            <f.icon className={`size-4 ${f.color}`} />
-                          </div>
-                          <span className="text-sm font-semibold">{f.label}</span>
-                        </div>
-                        <span className={`text-2xl font-black ${f.color}`}>{count}</span>
-                      </div>
-                      <div>
-                        <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                          <span>Part des demandes</span><span>{pct}%</span>
-                        </div>
-                        <Bar pct={pct} color={f.color.replace("text-", "bg-")} />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="rounded-2xl border border-border bg-secondary/20 p-6">
-                <h3 className="text-sm font-semibold mb-5 flex items-center gap-2">
-                  <Search className="size-4 text-primary" /> Répartition par secteur
+              <div className="card-surface p-6">
+                <h3 className="text-sm font-semibold mb-4 flex items-center gap-2">
+                  <Eye className="size-4 text-primary" /> Répartition par secteur
                 </h3>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {Object.entries(sectorCounts).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([sector, count]) => {
                     const max = Math.max(...Object.values(sectorCounts));
                     return (
                       <div key={sector}>
-                        <div className="flex justify-between text-sm mb-1.5">
+                        <div className="flex justify-between text-sm mb-1">
                           <span className="text-muted-foreground">{sector}</span>
-                          <span className="font-bold">{count}</span>
+                          <span className="font-medium">{count}</span>
                         </div>
-                        <Bar pct={(count / max) * 100} />
+                        <div className="h-2 bg-border rounded-full overflow-hidden">
+                          <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${(count / max) * 100}%` }} />
+                        </div>
                       </div>
                     );
                   })}
-                  {Object.keys(sectorCounts).length === 0 && <p className="text-sm text-muted-foreground">Aucune donnée</p>}
+                  {Object.keys(sectorCounts).length === 0 && (
+                    <p className="text-sm text-muted-foreground">Aucune donnée</p>
+                  )}
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-border bg-secondary/20 p-6">
-                <h3 className="text-sm font-semibold mb-5 flex items-center gap-2">
-                  <MousePointerClick className="size-4 text-primary" /> Activité récente
+              <div className="card-surface p-6">
+                <h3 className="text-sm font-semibold mb-4 flex items-center gap-2">
+                  <MousePointerClick className="size-4 text-primary" /> Types de besoin
                 </h3>
                 <div className="space-y-3">
-                  {recentActivity.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">Aucune activité récente</p>}
-                  {recentActivity.map((item, i) => (
-                    <div key={i} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
-                      <div className="flex items-center gap-3">
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${item.color}`}>{item.type}</span>
-                        <span className="text-sm font-medium">{item.name}</span>
+                  {Object.entries(besoinCounts).sort((a, b) => b[1] - a[1]).map(([besoin, count]) => {
+                    const max = Math.max(...Object.values(besoinCounts));
+                    return (
+                      <div key={besoin}>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span className="text-muted-foreground">{besoin}</span>
+                          <span className="font-medium">{count}</span>
+                        </div>
+                        <div className="h-2 bg-border rounded-full overflow-hidden">
+                          <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${(count / max) * 100}%` }} />
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground">{item.detail}</span>
-                        <ArrowUpRight className="size-3 text-muted-foreground" />
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
+                  {Object.keys(besoinCounts).length === 0 && (
+                    <p className="text-sm text-muted-foreground">Aucune donnée</p>
+                  )}
                 </div>
+              </div>
+            </div>
+
+            {/* Recent activity */}
+            <div className="card-surface p-6">
+              <h3 className="text-sm font-semibold mb-4">Dernières demandes</h3>
+              <div className="space-y-3">
+                {[...auditRequests.map(a => ({ type: "Formulaire", name: `${a.prenom} ${a.nom}`, detail: a.besoin, date: a.createdAt })),
+                  ...bookings.map(b => ({ type: "RDV", name: `${b.prenom} ${b.nom}`, detail: `${b.date} à ${b.time}`, date: b.createdAt }))
+                ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5).map((item, i) => (
+                  <div key={i} className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
+                    <div className="flex items-center gap-3">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${item.type === "RDV" ? "bg-primary/20 text-primary" : "bg-blue-500/20 text-blue-400"}`}>
+                        {item.type}
+                      </span>
+                      <span className="text-sm font-medium">{item.name}</span>
+                    </div>
+                    <span className="text-xs text-muted-foreground">{item.detail}</span>
+                  </div>
+                ))}
+                {auditRequests.length === 0 && bookings.length === 0 && (
+                  <p className="text-sm text-muted-foreground text-center py-4">Aucune activité récente</p>
+                )}
               </div>
             </div>
           </div>
         )}
 
-        {/* AUDIT REQUESTS */}
+        {/* ===== AUDIT REQUESTS ===== */}
         {tab === "audit_requests" && (
           selectedAudit ? (
-            <div className="rounded-2xl border border-border bg-secondary/20 p-6 max-w-2xl mx-auto">
+            <div className="card-surface p-6 max-w-2xl mx-auto">
               <button onClick={() => setSelectedAudit(null)} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
-                <ChevronLeft className="size-4" /> Retour
+                <ChevronLeft className="size-4" /> Retour à la liste
               </button>
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold">{selectedAudit.prenom} {selectedAudit.nom}</h3>
@@ -425,57 +266,66 @@ const Admin = () => {
                   { label: "Téléphone", value: selectedAudit.telephone },
                   { label: "Secteur", value: selectedAudit.secteur },
                   { label: "Besoin", value: selectedAudit.besoin || "—" },
-                ].map(field => (
+                ].map((field) => (
                   <div key={field.label} className="bg-secondary/50 rounded-xl p-4">
                     <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">{field.label}</p>
                     <p className="text-sm font-medium">{field.value}</p>
                   </div>
                 ))}
               </div>
-              <Button size="sm" variant="outline" className="rounded-lg mt-6">
-                <Phone className="size-3 mr-1" /> Appeler
-              </Button>
+              <div className="flex gap-3 mt-6">
+                <Button size="sm" variant="outline" className="rounded-lg">
+                  <Phone className="size-3 mr-1" /> Appeler
+                </Button>
+              </div>
             </div>
           ) : (
-            <div className="rounded-2xl border border-border overflow-hidden">
-              <div className="p-4 border-b border-border bg-secondary/30">
-                <h3 className="font-semibold">Demandes Audits</h3>
+            <div className="card-surface overflow-hidden">
+              <div className="p-4 border-b border-border">
+                <h3 className="font-semibold">Demandes Audits (Formulaire N°1)</h3>
                 <p className="text-xs text-muted-foreground mt-1">{auditRequests.length} demande(s)</p>
               </div>
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border bg-secondary/20">
-                    {["Date", "Nom", "Email", "Secteur"].map(h => (
-                      <th key={h} className="text-left px-4 py-3 text-muted-foreground font-medium">{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {auditRequests.length === 0
-                    ? <tr><td colSpan={4} className="px-4 py-10 text-center text-muted-foreground">Aucune demande pour l'instant</td></tr>
-                    : auditRequests.map((r, i) => (
-                      <tr key={i} onClick={() => setSelectedAudit(r)} className="border-b border-border/50 hover:bg-secondary/50 transition-colors cursor-pointer">
-                        <td className="px-4 py-3 text-muted-foreground">{new Date(r.createdAt).toLocaleDateString("fr-FR")}</td>
-                        <td className="px-4 py-3 font-medium">{r.prenom} {r.nom}</td>
-                        <td className="px-4 py-3">{r.email}</td>
-                        <td className="px-4 py-3"><span className="text-[11px] font-semibold bg-primary/10 text-primary px-2.5 py-1 rounded-full">{r.secteur}</span></td>
-                      </tr>
-                    ))
-                  }
-                </tbody>
-              </table>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border bg-secondary/30">
+                      <th className="text-left px-4 py-3 text-muted-foreground font-medium">Date</th>
+                      <th className="text-left px-4 py-3 text-muted-foreground font-medium">Nom</th>
+                      <th className="text-left px-4 py-3 text-muted-foreground font-medium">Email</th>
+                      <th className="text-left px-4 py-3 text-muted-foreground font-medium">Secteur</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {auditRequests.length === 0 ? (
+                      <tr><td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">Aucune demande</td></tr>
+                    ) : (
+                      auditRequests.map((r, i) => (
+                        <tr key={i} onClick={() => setSelectedAudit(r)} className="border-b border-border/50 hover:bg-secondary/50 transition-colors cursor-pointer">
+                          <td className="px-4 py-3 text-muted-foreground">{new Date(r.createdAt).toLocaleDateString("fr-FR")}</td>
+                          <td className="px-4 py-3 font-medium">{r.prenom} {r.nom}</td>
+                          <td className="px-4 py-3">{r.email}</td>
+                          <td className="px-4 py-3"><span className="badge-primary text-xs">{r.secteur}</span></td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )
         )}
 
-        {/* DIAGNOSTICS */}
+        {/* ===== DIAGNOSTICS ===== */}
         {tab === "diagnostics" && (
           selectedDiagnostic ? (
-            <div className="rounded-2xl border border-border bg-secondary/20 p-6 max-w-2xl mx-auto">
+            <div className="card-surface p-6 max-w-2xl mx-auto">
               <button onClick={() => setSelectedDiagnostic(null)} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
-                <ChevronLeft className="size-4" /> Retour
+                <ChevronLeft className="size-4" /> Retour à la liste
               </button>
-              <h3 className="text-xl font-bold mb-6">Diagnostic</h3>
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold">Diagnostic</h3>
+                <span className="text-xs text-muted-foreground">{new Date(selectedDiagnostic.date).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}</span>
+              </div>
               <div className="space-y-3">
                 {diagQuestions.map((q, i) => (
                   <div key={q} className="bg-secondary/50 rounded-xl p-4">
@@ -486,38 +336,80 @@ const Admin = () => {
               </div>
             </div>
           ) : (
-            <div className="rounded-2xl border border-border overflow-hidden">
-              <div className="p-4 border-b border-border bg-secondary/30">
-                <h3 className="font-semibold">Diagnostics réalisés</h3>
-                <p className="text-xs text-muted-foreground mt-1">{diagnostics.length} diagnostic(s)</p>
+            <div className="card-surface overflow-hidden">
+              <div className="p-4 border-b border-border">
+                <h3 className="font-semibold">Diagnostics réalisés (Formulaire N°2)</h3>
+                <p className="text-xs text-muted-foreground mt-1">{diagnostics.length} diagnostic(s) — pour phoning</p>
               </div>
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border bg-secondary/20">
-                    {["Date", "Secteur", "Site existant", "Demandes clients"].map(h => (
-                      <th key={h} className="text-left px-4 py-3 text-muted-foreground font-medium">{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {diagnostics.length === 0
-                    ? <tr><td colSpan={4} className="px-4 py-10 text-center text-muted-foreground">Aucun diagnostic</td></tr>
-                    : diagnostics.map((d, i) => (
-                      <tr key={i} onClick={() => setSelectedDiagnostic(d)} className="border-b border-border/50 hover:bg-secondary/50 transition-colors cursor-pointer">
-                        <td className="px-4 py-3 text-muted-foreground">{new Date(d.date).toLocaleDateString("fr-FR")}</td>
-                        <td className="px-4 py-3 font-medium">{d.answers[0] || "—"}</td>
-                        <td className="px-4 py-3">{d.answers[1] || "—"}</td>
-                        <td className="px-4 py-3">{d.answers[2] || "—"}</td>
-                      </tr>
-                    ))
-                  }
-                </tbody>
-              </table>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border bg-secondary/30">
+                      <th className="text-left px-4 py-3 text-muted-foreground font-medium">Date</th>
+                      <th className="text-left px-4 py-3 text-muted-foreground font-medium">Secteur</th>
+                      <th className="text-left px-4 py-3 text-muted-foreground font-medium">Site existant</th>
+                      <th className="text-left px-4 py-3 text-muted-foreground font-medium">Demandes clients</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {diagnostics.length === 0 ? (
+                      <tr><td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">Aucun diagnostic</td></tr>
+                    ) : (
+                      diagnostics.map((d, i) => (
+                        <tr key={i} onClick={() => setSelectedDiagnostic(d)} className="border-b border-border/50 hover:bg-secondary/50 transition-colors cursor-pointer">
+                          <td className="px-4 py-3 text-muted-foreground">{new Date(d.date).toLocaleDateString("fr-FR")}</td>
+                          <td className="px-4 py-3 font-medium">{d.answers[0] || "—"}</td>
+                          <td className="px-4 py-3">{d.answers[1] || "—"}</td>
+                          <td className="px-4 py-3">{d.answers[2] || "—"}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )
         )}
 
-        {/* PRODUCT REQUESTS */}
+        {/* ===== RDV - Calendar View ===== */}
+        {tab === "rdv" && (
+          <div className="space-y-6">
+            <div className="card-surface p-4 border-b border-border">
+              <h3 className="font-semibold">Rendez-vous réservés</h3>
+              <p className="text-xs text-muted-foreground mt-1">{bookings.length} rendez-vous</p>
+            </div>
+
+            {bookings.length === 0 ? (
+              <div className="card-surface p-8 text-center text-muted-foreground">Aucun rendez-vous réservé</div>
+            ) : (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {bookingsByDate.map(([date, entries]) => (
+                  <div key={date} className="card-surface overflow-hidden">
+                    <div className="bg-primary/10 px-4 py-3 border-b border-border">
+                      <p className="text-sm font-bold text-primary">
+                        {new Date(date).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground">{entries.length} RDV</p>
+                    </div>
+                    <div className="divide-y divide-border/50">
+                      {entries.sort((a, b) => a.time.localeCompare(b.time)).map((b, i) => (
+                        <div key={i} className="px-4 py-3 hover:bg-secondary/30 transition-colors">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-sm font-semibold">{b.prenom} {b.nom}</span>
+                            <span className="bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded-lg">{b.time}</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground">{b.telephone} · {b.secteur}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ===== PRODUCT REQUESTS ===== */}
         {tab === "product_requests" && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -525,76 +417,83 @@ const Admin = () => {
                 <h3 className="font-semibold">Demandes Produits</h3>
                 <p className="text-xs text-muted-foreground mt-1">{productRequests.length} demande(s)</p>
               </div>
-              <select value={productFilter} onChange={e => setProductFilter(e.target.value)}
-                className="bg-secondary border border-border rounded-xl px-4 py-2 text-sm text-foreground appearance-none focus:border-primary outline-none">
-                <option value="all">Tous les produits</option>
-                <option value="Site internet">🌐 Site internet</option>
-                <option value="Contenu marketing">📸 Contenu marketing</option>
-                <option value="Automatisation">⚡ Automatisation</option>
+              <select
+                value={productFilter}
+                onChange={(e) => setProductFilter(e.target.value)}
+                className="bg-secondary border border-border rounded-xl px-4 py-2 text-sm text-foreground appearance-none focus:border-primary outline-none"
+              >
+                <option value="all">Tous les axes</option>
+                <option value="Site internet">Axe 1 — Site internet</option>
+                <option value="Contenu marketing">Axe 2 — Contenu marketing</option>
+                <option value="Automatisation">Axe 3 — Automatisation</option>
               </select>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {productFamilies.map(f => {
-                const count = productRequests.filter(p => p.product === f.key).length;
-                const latest = productRequests.filter(p => p.product === f.key).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
-                return (
-                  <div key={f.key} className={`rounded-2xl border ${f.border} ${f.bg} p-5`}>
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className={`w-10 h-10 rounded-xl ${f.bg} border ${f.border} flex items-center justify-center`}>
-                        <f.icon className={`size-5 ${f.color}`} />
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground">{f.label}</p>
-                        <p className={`text-2xl font-black ${f.color}`}>{count}</p>
-                      </div>
-                    </div>
-                    {latest && (
-                      <p className="text-[11px] text-muted-foreground">
-                        Dernier : <span className="text-foreground font-medium">{latest.prenom} {latest.nom}</span>
-                        {" — "}{new Date(latest.createdAt).toLocaleDateString("fr-FR")}
-                      </p>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
+            {/* Pie chart */}
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="rounded-2xl border border-border bg-secondary/20 p-6 flex flex-col items-center">
-                <h4 className="text-sm font-semibold mb-6 self-start">Répartition visuelle</h4>
-                <DonutChart data={donutData} />
+              <div className="card-surface p-6 flex flex-col items-center justify-center">
+                <h4 className="text-sm font-semibold mb-6">Répartition par produit</h4>
+                {totalProductRequests === 0 ? (
+                  <p className="text-sm text-muted-foreground py-8">Aucune donnée</p>
+                ) : (
+                  <div className="relative">
+                    <svg width="180" height="180" viewBox="0 0 180 180">
+                      {(() => {
+                        const entries = Object.entries(productCounts);
+                        let cumAngle = 0;
+                        return entries.map(([product, count], i) => {
+                          const angle = (count / totalProductRequests) * 360;
+                          const startAngle = cumAngle;
+                          cumAngle += angle;
+                          const x1 = 90 + 80 * Math.cos((Math.PI / 180) * (startAngle - 90));
+                          const y1 = 90 + 80 * Math.sin((Math.PI / 180) * (startAngle - 90));
+                          const x2 = 90 + 80 * Math.cos((Math.PI / 180) * (startAngle + angle - 90));
+                          const y2 = 90 + 80 * Math.sin((Math.PI / 180) * (startAngle + angle - 90));
+                          const largeArc = angle > 180 ? 1 : 0;
+                          const d = entries.length === 1
+                            ? `M90,10 A80,80 0 1,1 89.99,10 Z`
+                            : `M90,90 L${x1},${y1} A80,80 0 ${largeArc},1 ${x2},${y2} Z`;
+                          return <path key={product} d={d} fill={pieColors[i % pieColors.length]} opacity={0.85} />;
+                        });
+                      })()}
+                      <circle cx="90" cy="90" r="40" fill="hsl(var(--background))" />
+                      <text x="90" y="90" textAnchor="middle" dominantBaseline="middle" fill="hsl(var(--foreground))" fontSize="20" fontWeight="bold">{totalProductRequests}</text>
+                    </svg>
+                    <div className="flex flex-wrap gap-3 mt-4 justify-center">
+                      {Object.entries(productCounts).map(([product, count], i) => (
+                        <div key={product} className="flex items-center gap-1.5 text-xs">
+                          <span className="size-2.5 rounded-full" style={{ backgroundColor: pieColors[i % pieColors.length] }} />
+                          {product} ({count})
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-              <div className="rounded-2xl border border-border overflow-hidden">
+
+              {/* Table */}
+              <div className="card-surface overflow-hidden">
                 <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
                   <table className="w-full text-sm">
                     <thead className="sticky top-0 bg-secondary/80 backdrop-blur">
                       <tr className="border-b border-border">
-                        {["Date", "Nom", "Produit"].map(h => (
-                          <th key={h} className="text-left px-4 py-3 text-muted-foreground font-medium">{h}</th>
-                        ))}
+                        <th className="text-left px-4 py-3 text-muted-foreground font-medium">Date</th>
+                        <th className="text-left px-4 py-3 text-muted-foreground font-medium">Nom</th>
+                        <th className="text-left px-4 py-3 text-muted-foreground font-medium">Produit</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {(productFilter === "all" ? productRequests : productRequests.filter(p => p.product === productFilter)).length === 0
-                        ? <tr><td colSpan={3} className="px-4 py-10 text-center text-muted-foreground">Aucune demande</td></tr>
-                        : (productFilter === "all" ? productRequests : productRequests.filter(p => p.product === productFilter))
-                          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-                          .map((p, i) => {
-                            const fam = productFamilies.find(f => f.key === p.product);
-                            return (
-                              <tr key={i} className="border-b border-border/50 hover:bg-secondary/50 transition-colors">
-                                <td className="px-4 py-3 text-muted-foreground">{new Date(p.createdAt).toLocaleDateString("fr-FR")}</td>
-                                <td className="px-4 py-3 font-medium">{p.prenom} {p.nom}</td>
-                                <td className="px-4 py-3">
-                                  <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${fam?.bg || "bg-primary/10"} ${fam?.color || "text-primary"}`}>
-                                    {p.product}
-                                  </span>
-                                </td>
-                              </tr>
-                            );
-                          })
-                      }
+                      {(productFilter === "all" ? productRequests : productRequests.filter(p => p.product === productFilter)).length === 0 ? (
+                        <tr><td colSpan={3} className="px-4 py-8 text-center text-muted-foreground">Aucune demande</td></tr>
+                      ) : (
+                        (productFilter === "all" ? productRequests : productRequests.filter(p => p.product === productFilter)).map((p, i) => (
+                          <tr key={i} className="border-b border-border/50 hover:bg-secondary/50 transition-colors">
+                            <td className="px-4 py-3 text-muted-foreground">{new Date(p.createdAt).toLocaleDateString("fr-FR")}</td>
+                            <td className="px-4 py-3 font-medium">{p.prenom} {p.nom}</td>
+                            <td className="px-4 py-3"><span className="badge-primary text-xs">{p.product}</span></td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>
