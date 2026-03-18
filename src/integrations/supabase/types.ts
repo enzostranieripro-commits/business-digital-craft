@@ -14,7 +14,147 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      audit_requests: {
+        Row: {
+          besoin: string | null
+          created_at: string
+          email: string
+          id: string
+          nom: string
+          prenom: string
+          secteur: string
+          telephone: string | null
+        }
+        Insert: {
+          besoin?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          nom: string
+          prenom: string
+          secteur: string
+          telephone?: string | null
+        }
+        Update: {
+          besoin?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          nom?: string
+          prenom?: string
+          secteur?: string
+          telephone?: string | null
+        }
+        Relationships: []
+      }
+      bookings: {
+        Row: {
+          besoin: string | null
+          created_at: string
+          date: string
+          email: string
+          id: string
+          nom: string
+          prenom: string
+          secteur: string
+          status: string
+          telephone: string | null
+          time: string
+        }
+        Insert: {
+          besoin?: string | null
+          created_at?: string
+          date: string
+          email: string
+          id?: string
+          nom: string
+          prenom: string
+          secteur: string
+          status?: string
+          telephone?: string | null
+          time: string
+        }
+        Update: {
+          besoin?: string | null
+          created_at?: string
+          date?: string
+          email?: string
+          id?: string
+          nom?: string
+          prenom?: string
+          secteur?: string
+          status?: string
+          telephone?: string | null
+          time?: string
+        }
+        Relationships: []
+      }
+      diagnostics: {
+        Row: {
+          a_un_site: string
+          created_at: string
+          demandes_semaine: string
+          id: string
+          offre_recommandee: string
+          reseaux_sociaux: string
+          secteur: string
+          taches_repetitives: string[] | null
+        }
+        Insert: {
+          a_un_site: string
+          created_at?: string
+          demandes_semaine: string
+          id?: string
+          offre_recommandee: string
+          reseaux_sociaux: string
+          secteur: string
+          taches_repetitives?: string[] | null
+        }
+        Update: {
+          a_un_site?: string
+          created_at?: string
+          demandes_semaine?: string
+          id?: string
+          offre_recommandee?: string
+          reseaux_sociaux?: string
+          secteur?: string
+          taches_repetitives?: string[] | null
+        }
+        Relationships: []
+      }
+      product_requests: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          nom: string
+          prenom: string
+          product: string
+          secteur: string
+          telephone: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          nom: string
+          prenom: string
+          product: string
+          secteur: string
+          telephone?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          nom?: string
+          prenom?: string
+          product?: string
+          secteur?: string
+          telephone?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
