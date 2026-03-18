@@ -29,7 +29,7 @@ const ComparateurSection = () => {
         <SectionHeader
           label="COMPARATIF"
           title="Pourquoi choisir"
-          highlight="Studio Nova ?"
+          highlight="AS Consulting ?"
           description="Comparez objectivement les 3 options qui s'offrent à vous."
         />
         <motion.div
