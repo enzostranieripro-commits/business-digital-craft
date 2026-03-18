@@ -24,7 +24,7 @@ const SiteFooter = () => {
         </div>
         <div>
           <h4 className="font-semibold text-sm mb-4">Contact</h4>
-          <ul className="space-y-2 text-sm text-muted-foreground"><li>contact@studionova.fr</li><li>05 65 00 00 00</li><li>Rodez, Aveyron (12)</li><li>Lun-Ven 9h-18h</li></ul>
+          <ul className="space-y-2 text-sm text-muted-foreground"><li>contact@asconsulting.fr</li><li>05 65 00 00 00</li><li>Rodez, Aveyron (12)</li><li>Lun-Ven 9h-18h</li></ul>
         </div>
       </div>
       <div className="max-w-6xl mx-auto mt-12 pt-6 border-t border-border/30 flex flex-col md:flex-row justify-between items-center text-xs text-muted-foreground">
