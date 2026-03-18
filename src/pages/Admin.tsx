@@ -8,6 +8,7 @@ import { toast } from "sonner";
 type Tab = "dashboard" | "leads" | "bookings" | "offers" | "diagnostics" | "settings";
 
 const Admin = () => {
+  const { signOut } = useAuth();
   const [tab, setTab] = useState<Tab>("dashboard");
   const [leads, setLeads] = useState<any[]>([]);
   const [bookings, setBookings] = useState<any[]>([]);
