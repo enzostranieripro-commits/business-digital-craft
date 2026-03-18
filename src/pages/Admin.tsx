@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Wifi, WifiOff, Trash2, BarChart3, Users, Calendar, Package, Settings, LayoutDashboard, LogOut, Bell } from "lucide-react";
+import { Wifi, WifiOff, Trash2, BarChart3, Users, Calendar, Package, Settings, LayoutDashboard, LogOut, Briefcase } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import AdminDashboardTab from "@/components/admin/AdminDashboardTab";
