@@ -51,7 +51,7 @@ const ServicesSection = () => {
 
           })}
         </div>
-        <p className="text-center text-sm text-muted-foreground mt-8"><span className="font-semibold text-foreground">47 entreprises</span> nous ont déjà fait confiance</p>
+        
       </div>
     </section>);
 
