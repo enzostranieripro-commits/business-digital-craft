@@ -75,6 +75,9 @@ const Login = () => {
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Connexion..." : "Se connecter"}
           </Button>
+          <Link to="/forgot-password" className="block text-center text-xs text-muted-foreground hover:text-primary">
+            Mot de passe oublié ?
+          </Link>
         </form>
 
         <a href="/" className="block text-center text-xs text-muted-foreground hover:text-foreground mt-4">
