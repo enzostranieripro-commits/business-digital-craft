@@ -11,6 +11,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, 
 interface AdminHostingTabProps {
   subscriptions: any[];
   leads: any[];
+  payments?: any[];
   fetchAll: () => void;
 }
 
