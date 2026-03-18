@@ -7,7 +7,7 @@ const SiteFooter = () => {
     <footer className="border-t border-border/30 py-16 px-4 md:px-8">
       <div className="max-w-6xl mx-auto grid md:grid-cols-4 gap-8">
         <div>
-          <span className="font-display text-xl font-extrabold">Studio<span className="text-primary">Nova</span></span>
+          <span className="font-display text-lg font-extrabold">Angelot & Stranieri<span className="text-primary"> Consulting</span></span>
           <p className="text-sm text-muted-foreground mt-3">Agence web pour artisans, commerçants et indépendants en Aveyron & Occitanie.</p>
         </div>
         <div>
