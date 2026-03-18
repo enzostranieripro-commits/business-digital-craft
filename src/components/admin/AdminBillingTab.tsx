@@ -385,7 +385,8 @@ const AdminBillingTab = ({ leads, fetchAll }: Props) => {
       );
       const to = invoice.client_email ? encodeURIComponent(invoice.client_email) : "";
       
-      window.open(`mailto:${to}?subject=${subject}&body=${body}`, "_self");
+      const gmailUrl = `https://mail.google.com/mail/?view=cm&to=${to}&su=${subject}&body=${body}`;
+      window.open(gmailUrl, "_blank");
 
       // Auto-update status to "envoyé" if still brouillon
       if (invoice.status === "brouillon") {
