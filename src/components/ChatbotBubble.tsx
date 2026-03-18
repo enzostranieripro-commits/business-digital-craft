@@ -10,7 +10,7 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 const ChatbotBubble = () => {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([
-    { role: "assistant", content: "Bonjour ! 👋 Je suis le conseiller Studio Nova. Comment puis-je vous aider à développer votre activité en ligne ?" },
+    { role: "assistant", content: "Bonjour ! 👋 Je suis le conseiller Angelot & Stranieri Consulting. Comment puis-je vous aider à développer votre activité en ligne ?" },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
