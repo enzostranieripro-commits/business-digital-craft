@@ -168,29 +168,7 @@ const Admin = () => {
         )}
 
         {tab === "settings" && (
-          <div>
-            <h1 className="text-2xl font-bold mb-6">Paramètres</h1>
-            <div className="card-surface p-6">
-              <h3 className="font-semibold text-destructive mb-4">Zone dangereuse</h3>
-              <div className="space-y-3">
-                {[{ table: "audit_requests", label: "leads" }, { table: "bookings", label: "rendez-vous" }, { table: "product_requests", label: "demandes produits" }, { table: "diagnostics", label: "diagnostics" }].map(t => (
-                  <Button key={t.table} variant="outline" size="sm" className="border-destructive/30 text-destructive hover:bg-destructive/10"
-                    onClick={async () => { if (confirm(`Supprimer tous les ${t.label} ?`)) { await supabase.from(t.table as any).delete().neq("id", "00000000-0000-0000-0000-000000000000"); fetchAll(); toast(`${t.label} supprimés`); } }}>
-                    <Trash2 className="size-4 mr-2" />Supprimer tous les {t.label}
-                  </Button>
-                ))}
-              </div>
-            </div>
-            <div className="card-surface p-6 mt-4">
-              <h3 className="font-semibold mb-3">Statistiques globales</h3>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div><p className="text-muted-foreground">Total leads</p><p className="font-bold text-lg">{leads.length}</p></div>
-                <div><p className="text-muted-foreground">Total RDV</p><p className="font-bold text-lg">{bookings.length}</p></div>
-                <div><p className="text-muted-foreground">Total diagnostics</p><p className="font-bold text-lg">{diagnostics.length}</p></div>
-                <div><p className="text-muted-foreground">Total demandes produits</p><p className="font-bold text-lg">{products.length}</p></div>
-              </div>
-            </div>
-          </div>
+          <AdminSettingsTab leads={leads} bookings={bookings} diagnostics={diagnostics} products={products} fetchAll={fetchAll} />
         )}
       </div>
     </div>
