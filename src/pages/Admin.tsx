@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Wifi, WifiOff, Trash2, Download, Search, BarChart3, Users, Calendar, Package, Settings, LayoutDashboard } from "lucide-react";
+import { Wifi, WifiOff, Trash2, Download, Search, BarChart3, Users, Calendar, Package, Settings, LayoutDashboard, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
 type Tab = "dashboard" | "leads" | "bookings" | "offers" | "diagnostics" | "settings";
