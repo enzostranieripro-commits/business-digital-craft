@@ -479,9 +479,6 @@ const AdminBillingTab = ({ leads, fetchAll }: Props) => {
                       <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleDownloadPDF(inv)} disabled={generating === inv.id} title="Télécharger PDF">
                         <Download className="size-3.5" />
                       </Button>
-                      <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleSendByEmail(inv)} disabled={generating === inv.id} title="Envoyer par email">
-                        <Send className="size-3.5" />
-                      </Button>
                       {inv.type === "devis" && inv.status !== "accepté" && (
                         <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleConvertToInvoice(inv)} title="Convertir en facture">
                           <ArrowRightLeft className="size-3.5" />
