@@ -78,6 +78,7 @@ const AdminHostingTab = ({ subscriptions, leads, payments = [], fetchAll }: Admi
   }, [enriched]);
 
   const updatePaymentStatus = async (id: string, status: string) => {
+    const sub = enriched.find((s: any) => s.id === id);
     const updateData: any = { payment_status: status, updated_at: new Date().toISOString() };
     if (status === "a_jour") {
       const now = new Date();
@@ -85,11 +86,21 @@ const AdminHostingTab = ({ subscriptions, leads, payments = [], fetchAll }: Admi
       nextPayment.setMonth(nextPayment.getMonth() + 1);
       updateData.last_payment_at = now.toISOString();
       updateData.next_payment_at = nextPayment.toISOString();
+      // Log payment in history
+      if (sub) {
+        await supabase.from("payment_history").insert({
+          subscription_id: id,
+          lead_id: sub.lead_id,
+          amount: Number(sub.monthly_amount) || 0,
+          payment_method: "virement",
+          payment_date: now.toISOString(),
+        } as any);
+      }
     }
     await supabase.from("client_subscriptions").update(updateData).eq("id", id);
     fetchAll();
     if (selectedSub?.id === id) setSelectedSub({ ...selectedSub, ...updateData });
-    if (status === "a_jour") toast("✅ Paiement enregistré");
+    if (status === "a_jour") toast("✅ Paiement enregistré dans l'historique");
     else if (status === "suspendu") toast("⚠️ Accès suspendu");
     else toast(`Statut → ${PAYMENT_STATUSES.find(p => p.value === status)?.label}`);
   };
