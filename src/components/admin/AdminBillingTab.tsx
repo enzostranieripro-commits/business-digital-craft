@@ -336,35 +336,65 @@ const AdminBillingTab = ({ leads, fetchAll }: Props) => {
     setLoading(false);
   };
 
+  const generatePDFHtml = async (invoice: Invoice): Promise<string> => {
+    const { data: items } = await supabase
+      .from("invoice_items")
+      .select("*")
+      .eq("invoice_id", invoice.id)
+      .order("sort_order");
+
+    const response = await supabase.functions.invoke("generate-invoice-pdf", {
+      body: { invoice, items: items || [] },
+    });
+
+    if (response.error) throw new Error(response.error.message);
+    return atob(response.data.pdf_base64);
+  };
+
   const handleDownloadPDF = async (invoice: Invoice) => {
     setGenerating(invoice.id);
     try {
-      // Fetch items
-      const { data: items } = await supabase
-        .from("invoice_items")
-        .select("*")
-        .eq("invoice_id", invoice.id)
-        .order("sort_order");
-
-      const response = await supabase.functions.invoke("generate-invoice-pdf", {
-        body: { invoice, items: items || [] },
-      });
-
-      if (response.error) throw new Error(response.error.message);
-
-      const { pdf_base64 } = response.data;
-      // Decode base64 HTML and open in new tab for print
-      const html = atob(pdf_base64);
+      const html = await generatePDFHtml(invoice);
       const printWindow = window.open("", "_blank");
       if (printWindow) {
         printWindow.document.write(html);
         printWindow.document.close();
         setTimeout(() => printWindow.print(), 500);
       }
-
       toast.success("PDF téléchargé");
     } catch (e: any) {
       toast.error("Erreur lors de la génération du PDF");
+      console.error(e);
+    }
+    setGenerating(null);
+  };
+
+  const handleSendByEmail = async (invoice: Invoice) => {
+    setGenerating(invoice.id);
+    try {
+      const typeLabel = invoice.type === "devis" ? "Devis" : "Facture";
+      const subject = encodeURIComponent(`${typeLabel} ${invoice.number} — Angelot & Stranieri Consulting`);
+      const body = encodeURIComponent(
+        `Bonjour ${invoice.client_name},\n\n` +
+        `Veuillez trouver ci-joint votre ${typeLabel.toLowerCase()} n°${invoice.number} d'un montant de ${Number(invoice.total_ttc).toLocaleString("fr-FR")}€.\n\n` +
+        `Date d'émission : ${format(new Date(invoice.issue_date), "dd/MM/yyyy")}\n` +
+        (invoice.validity_date ? `Date de validité : ${format(new Date(invoice.validity_date), "dd/MM/yyyy")}\n` : "") +
+        (invoice.due_date ? `Date d'échéance : ${format(new Date(invoice.due_date), "dd/MM/yyyy")}\n` : "") +
+        `\nN'hésitez pas à nous contacter pour toute question.\n\n` +
+        `Cordialement,\nAngelot & Stranieri Consulting`
+      );
+      const to = invoice.client_email ? encodeURIComponent(invoice.client_email) : "";
+      
+      window.open(`mailto:${to}?subject=${subject}&body=${body}`, "_self");
+
+      // Auto-update status to "envoyé" if still brouillon
+      if (invoice.status === "brouillon") {
+        await supabase.from("invoices").update({ status: "envoyé", updated_at: new Date().toISOString() }).eq("id", invoice.id);
+        toast.success(`${typeLabel} marqué(e) comme envoyé(e)`);
+        fetchInvoices();
+      }
+    } catch (e: any) {
+      toast.error("Erreur lors de l'envoi");
       console.error(e);
     }
     setGenerating(null);
