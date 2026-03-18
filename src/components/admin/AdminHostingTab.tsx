@@ -11,6 +11,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, 
 interface AdminHostingTabProps {
   subscriptions: any[];
   leads: any[];
+  payments?: any[];
   fetchAll: () => void;
 }
 
@@ -30,7 +31,7 @@ const OFFER_COLORS: Record<string, string> = {
 const PIE_COLORS = ["hsl(158, 60%, 48%)", "hsl(265, 89%, 60%)", "hsl(35, 85%, 56%)", "hsl(215, 20%, 55%)"];
 const STATUS_PIE_COLORS = ["hsl(158, 60%, 48%)", "hsl(35, 85%, 56%)", "hsl(0, 84%, 60%)", "hsl(215, 20%, 55%)"];
 
-const AdminHostingTab = ({ subscriptions, leads, fetchAll }: AdminHostingTabProps) => {
+const AdminHostingTab = ({ subscriptions, leads, payments = [], fetchAll }: AdminHostingTabProps) => {
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
   const [selectedSub, setSelectedSub] = useState<any | null>(null);
@@ -77,6 +78,7 @@ const AdminHostingTab = ({ subscriptions, leads, fetchAll }: AdminHostingTabProp
   }, [enriched]);
 
   const updatePaymentStatus = async (id: string, status: string) => {
+    const sub = enriched.find((s: any) => s.id === id);
     const updateData: any = { payment_status: status, updated_at: new Date().toISOString() };
     if (status === "a_jour") {
       const now = new Date();
@@ -84,11 +86,21 @@ const AdminHostingTab = ({ subscriptions, leads, fetchAll }: AdminHostingTabProp
       nextPayment.setMonth(nextPayment.getMonth() + 1);
       updateData.last_payment_at = now.toISOString();
       updateData.next_payment_at = nextPayment.toISOString();
+      // Log payment in history
+      if (sub) {
+        await supabase.from("payment_history").insert({
+          subscription_id: id,
+          lead_id: sub.lead_id,
+          amount: Number(sub.monthly_amount) || 0,
+          payment_method: "virement",
+          payment_date: now.toISOString(),
+        } as any);
+      }
     }
     await supabase.from("client_subscriptions").update(updateData).eq("id", id);
     fetchAll();
     if (selectedSub?.id === id) setSelectedSub({ ...selectedSub, ...updateData });
-    if (status === "a_jour") toast("✅ Paiement enregistré");
+    if (status === "a_jour") toast("✅ Paiement enregistré dans l'historique");
     else if (status === "suspendu") toast("⚠️ Accès suspendu");
     else toast(`Statut → ${PAYMENT_STATUSES.find(p => p.value === status)?.label}`);
   };

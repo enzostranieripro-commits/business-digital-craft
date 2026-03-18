@@ -9,6 +9,7 @@ interface AdminDashboardTabProps {
   products: any[];
   diagnostics: any[];
   subscriptions?: any[];
+  payments?: any[];
 }
 
 const COLORS = {
@@ -29,7 +30,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 const FUNNEL_COLORS = ["#3b82f6", "#f59e0b", COLORS.primary, COLORS.visibility];
 
-const AdminDashboardTab = ({ leads, bookings, products, diagnostics, subscriptions = [] }: AdminDashboardTabProps) => {
+const AdminDashboardTab = ({ leads, bookings, products, diagnostics, subscriptions = [], payments = [] }: AdminDashboardTabProps) => {
   const [followUps, setFollowUps] = useState<any[]>([]);
 
   useEffect(() => {

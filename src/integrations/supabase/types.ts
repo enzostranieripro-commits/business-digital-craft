@@ -113,6 +113,53 @@ export type Database = {
         }
         Relationships: []
       }
+      client_projects: {
+        Row: {
+          created_at: string
+          delivered_at: string | null
+          id: string
+          lead_id: string
+          name: string
+          notes: string | null
+          progress: number
+          started_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          delivered_at?: string | null
+          id?: string
+          lead_id: string
+          name: string
+          notes?: string | null
+          progress?: number
+          started_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          delivered_at?: string | null
+          id?: string
+          lead_id?: string
+          name?: string
+          notes?: string | null
+          progress?: number
+          started_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_projects_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "audit_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_subscriptions: {
         Row: {
           created_at: string
@@ -272,6 +319,54 @@ export type Database = {
           },
         ]
       }
+      payment_history: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          lead_id: string
+          notes: string | null
+          payment_date: string
+          payment_method: string
+          subscription_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          id?: string
+          lead_id: string
+          notes?: string | null
+          payment_date?: string
+          payment_method?: string
+          subscription_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          lead_id?: string
+          notes?: string | null
+          payment_date?: string
+          payment_method?: string
+          subscription_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_history_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "audit_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_history_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "client_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_requests: {
         Row: {
           created_at: string
@@ -304,6 +399,41 @@ export type Database = {
           telephone?: string | null
         }
         Relationships: []
+      }
+      project_tasks: {
+        Row: {
+          completed: boolean
+          created_at: string
+          id: string
+          project_id: string
+          sort_order: number
+          title: string
+        }
+        Insert: {
+          completed?: boolean
+          created_at?: string
+          id?: string
+          project_id: string
+          sort_order?: number
+          title: string
+        }
+        Update: {
+          completed?: boolean
+          created_at?: string
+          id?: string
+          project_id?: string
+          sort_order?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_tasks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "client_projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import {
   LayoutDashboard, Users, Briefcase, Server, Calendar, Package, BarChart3, Settings,
-  LogOut, Wifi, WifiOff, ChevronLeft, Bell, Search
+  LogOut, Wifi, WifiOff, ChevronLeft, Bell, Search, FolderKanban, DollarSign
 } from "lucide-react";
 import AdminDashboardTab from "@/components/admin/AdminDashboardTab";
 import AdminLeadsTab from "@/components/admin/AdminLeadsTab";
@@ -14,14 +14,17 @@ import AdminBookingsTab from "@/components/admin/AdminBookingsTab";
 import AdminOffersTab from "@/components/admin/AdminOffersTab";
 import AdminDiagnosticsTab from "@/components/admin/AdminDiagnosticsTab";
 import AdminSettingsTab from "@/components/admin/AdminSettingsTab";
+import AdminProjectsTab from "@/components/admin/AdminProjectsTab";
+import AdminFinanceTab from "@/components/admin/AdminFinanceTab";
 
-type Tab = "dashboard" | "leads" | "clients" | "hosting" | "bookings" | "offers" | "diagnostics" | "settings";
+type Tab = "dashboard" | "leads" | "clients" | "hosting" | "bookings" | "offers" | "diagnostics" | "settings" | "projects" | "finance";
 
 const SIDEBAR_SECTIONS = [
   {
     label: "Vue d'ensemble",
     items: [
       { id: "dashboard" as Tab, label: "Dashboard", icon: LayoutDashboard },
+      { id: "finance" as Tab, label: "Finances", icon: DollarSign },
     ],
   },
   {
@@ -36,6 +39,7 @@ const SIDEBAR_SECTIONS = [
     label: "Exploitation",
     items: [
       { id: "hosting" as Tab, label: "Hébergement & Abo.", icon: Server },
+      { id: "projects" as Tab, label: "Projets / Livrables", icon: FolderKanban },
       { id: "offers" as Tab, label: "Demandes Produits", icon: Package },
       { id: "diagnostics" as Tab, label: "Diagnostics", icon: BarChart3 },
     ],
@@ -57,21 +61,27 @@ const Admin = () => {
   const [products, setProducts] = useState<any[]>([]);
   const [diagnostics, setDiagnostics] = useState<any[]>([]);
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
+  const [payments, setPayments] = useState<any[]>([]);
+  const [projects, setProjects] = useState<any[]>([]);
   const [connected, setConnected] = useState(true);
 
   const fetchAll = async () => {
-    const [l, b, p, d, s] = await Promise.all([
+    const [l, b, p, d, s, ph, pr] = await Promise.all([
       supabase.from("audit_requests").select("*").order("created_at", { ascending: false }),
       supabase.from("bookings").select("*").order("created_at", { ascending: false }),
       supabase.from("product_requests").select("*").order("created_at", { ascending: false }),
       supabase.from("diagnostics").select("*").order("created_at", { ascending: false }),
       supabase.from("client_subscriptions").select("*").order("created_at", { ascending: false }),
+      supabase.from("payment_history").select("*").order("payment_date", { ascending: false }),
+      supabase.from("client_projects").select("*").order("created_at", { ascending: false }),
     ]);
     if (l.data) setLeads(l.data);
     if (b.data) setBookings(b.data);
     if (p.data) setProducts(p.data);
     if (d.data) setDiagnostics(d.data);
     if (s.data) setSubscriptions(s.data);
+    if (ph.data) setPayments(ph.data);
+    if (pr.data) setProjects(pr.data);
   };
 
   useEffect(() => { fetchAll(); }, []);
@@ -221,10 +231,12 @@ const Admin = () => {
 
         {/* Content area */}
         <main className="flex-1 p-8 overflow-y-auto">
-          {tab === "dashboard" && <AdminDashboardTab leads={leads} bookings={bookings} products={products} diagnostics={diagnostics} subscriptions={subscriptions} />}
+          {tab === "dashboard" && <AdminDashboardTab leads={leads} bookings={bookings} products={products} diagnostics={diagnostics} subscriptions={subscriptions} payments={payments} />}
+          {tab === "finance" && <AdminFinanceTab subscriptions={subscriptions} payments={payments} leads={leads} fetchAll={fetchAll} />}
           {tab === "leads" && <AdminLeadsTab leads={leads} fetchAll={fetchAll} />}
           {tab === "clients" && <AdminClientsTab leads={leads} bookings={bookings} products={products} subscriptions={subscriptions} fetchAll={fetchAll} />}
-          {tab === "hosting" && <AdminHostingTab subscriptions={subscriptions} leads={leads} fetchAll={fetchAll} />}
+          {tab === "hosting" && <AdminHostingTab subscriptions={subscriptions} leads={leads} payments={payments} fetchAll={fetchAll} />}
+          {tab === "projects" && <AdminProjectsTab leads={leads} projects={projects} fetchAll={fetchAll} />}
           {tab === "bookings" && <AdminBookingsTab bookings={bookings} fetchAll={fetchAll} />}
           {tab === "offers" && <AdminOffersTab products={products} />}
           {tab === "diagnostics" && <AdminDiagnosticsTab diagnostics={diagnostics} />}
