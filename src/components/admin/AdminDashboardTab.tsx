@@ -115,7 +115,7 @@ const AdminDashboardTab = ({ leads, bookings, products, diagnostics, subscriptio
       </p>
 
       {/* KPIs */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-7 gap-4 mb-8">
         {[
           { label: "Total Leads", value: leads.length, color: "text-primary" },
           { label: "Taux conversion", value: `${convRate}%`, color: "text-conversion" },
