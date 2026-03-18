@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Wifi, WifiOff, Trash2, Download, Search, BarChart3, Users, Calendar, Package, Settings, LayoutDashboard } from "lucide-react";
+import { Wifi, WifiOff, Trash2, Download, Search, BarChart3, Users, Calendar, Package, Settings, LayoutDashboard, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
 type Tab = "dashboard" | "leads" | "bookings" | "offers" | "diagnostics" | "settings";
 
 const Admin = () => {
+  const { signOut } = useAuth();
   const [tab, setTab] = useState<Tab>("dashboard");
   const [leads, setLeads] = useState<any[]>([]);
   const [bookings, setBookings] = useState<any[]>([]);
@@ -86,7 +88,10 @@ const Admin = () => {
             </button>
           ))}
         </nav>
-        <a href="/" className="text-xs text-muted-foreground hover:text-foreground mt-4">← Retour au site</a>
+        <a href="/" className="text-xs text-muted-foreground hover:text-foreground mt-2">← Retour au site</a>
+        <button onClick={signOut} className="flex items-center gap-2 text-xs text-destructive hover:text-destructive/80 mt-2">
+          <LogOut className="size-3" />Déconnexion
+        </button>
       </div>
 
       <div className="flex-1 p-8 overflow-y-auto">
