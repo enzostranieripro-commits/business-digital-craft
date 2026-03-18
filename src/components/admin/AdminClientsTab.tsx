@@ -128,7 +128,13 @@ const AdminClientsTab = ({ leads, bookings, products, subscriptions, fetchAll }:
 
   const saveSub = async () => {
     if (!selectedClient) return;
-    const payload = {
+    
+    // Auto-calculate next_payment_at (1 month from now for new subscriptions)
+    const now = new Date();
+    const nextPayment = new Date(now);
+    nextPayment.setMonth(nextPayment.getMonth() + 1);
+    
+    const payload: any = {
       lead_id: selectedClient.id,
       offer_level: subForm.offer_level,
       options: subForm.options,
@@ -137,13 +143,22 @@ const AdminClientsTab = ({ leads, bookings, products, subscriptions, fetchAll }:
       hosting_included: subForm.hosting_included,
       hosting_domain: subForm.hosting_domain || null,
       notes: subForm.notes || null,
-      updated_at: new Date().toISOString(),
+      updated_at: now.toISOString(),
     };
 
+    // For new abonnements, set payment dates
+    if (subForm.payment_type === "abonnement") {
+      if (!selectedClient.subscription) {
+        payload.last_payment_at = now.toISOString();
+        payload.next_payment_at = nextPayment.toISOString();
+        payload.payment_status = "a_jour";
+      }
+    }
+
     if (selectedClient.subscription) {
-      await supabase.from("client_subscriptions" as any).update(payload as any).eq("id", selectedClient.subscription.id);
+      await supabase.from("client_subscriptions" as any).update(payload).eq("id", selectedClient.subscription.id);
     } else {
-      await supabase.from("client_subscriptions" as any).insert(payload as any);
+      await supabase.from("client_subscriptions" as any).insert(payload);
     }
     toast("Contrat client mis à jour ✓");
     setEditingSub(false);
