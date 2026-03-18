@@ -369,36 +369,9 @@ const AdminBillingTab = ({ leads, fetchAll }: Props) => {
     setGenerating(null);
   };
 
-  const handleSendByEmail = async (invoice: Invoice) => {
-    setGenerating(invoice.id);
-    try {
-      const typeLabel = invoice.type === "devis" ? "Devis" : "Facture";
-      const subject = encodeURIComponent(`${typeLabel} ${invoice.number} — Angelot & Stranieri Consulting`);
-      const body = encodeURIComponent(
-        `Bonjour ${invoice.client_name},\n\n` +
-        `Veuillez trouver ci-joint votre ${typeLabel.toLowerCase()} n°${invoice.number} d'un montant de ${Number(invoice.total_ttc).toLocaleString("fr-FR")}€.\n\n` +
-        `Date d'émission : ${format(new Date(invoice.issue_date), "dd/MM/yyyy")}\n` +
-        (invoice.validity_date ? `Date de validité : ${format(new Date(invoice.validity_date), "dd/MM/yyyy")}\n` : "") +
-        (invoice.due_date ? `Date d'échéance : ${format(new Date(invoice.due_date), "dd/MM/yyyy")}\n` : "") +
-        `\nN'hésitez pas à nous contacter pour toute question.\n\n` +
-        `Cordialement,\nAngelot & Stranieri Consulting`
-      );
-      const to = invoice.client_email ? encodeURIComponent(invoice.client_email) : "";
-      
-      const gmailUrl = `https://mail.google.com/mail/?view=cm&to=${to}&su=${subject}&body=${body}`;
-      window.open(gmailUrl, "_blank");
-
-      // Auto-update status to "envoyé" if still brouillon
-      if (invoice.status === "brouillon") {
-        await supabase.from("invoices").update({ status: "envoyé", updated_at: new Date().toISOString() }).eq("id", invoice.id);
-        toast.success(`${typeLabel} marqué(e) comme envoyé(e)`);
-        fetchInvoices();
-      }
-    } catch (e: any) {
-      toast.error("Erreur lors de l'envoi");
-      console.error(e);
-    }
-    setGenerating(null);
+  const handleSendByEmail = (invoice: Invoice) => {
+    const to = invoice.client_email || "";
+    window.open(`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(to)}`, "_blank");
   };
 
   const filtered = invoices.filter(inv => {
