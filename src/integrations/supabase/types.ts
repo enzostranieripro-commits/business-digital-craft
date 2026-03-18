@@ -92,6 +92,65 @@ export type Database = {
         }
         Relationships: []
       }
+      client_subscriptions: {
+        Row: {
+          created_at: string
+          hosting_domain: string | null
+          hosting_included: boolean
+          id: string
+          last_payment_at: string | null
+          lead_id: string
+          monthly_amount: number
+          next_payment_at: string | null
+          notes: string | null
+          offer_level: string
+          options: string[]
+          payment_status: string
+          payment_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          hosting_domain?: string | null
+          hosting_included?: boolean
+          id?: string
+          last_payment_at?: string | null
+          lead_id: string
+          monthly_amount?: number
+          next_payment_at?: string | null
+          notes?: string | null
+          offer_level?: string
+          options?: string[]
+          payment_status?: string
+          payment_type?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          hosting_domain?: string | null
+          hosting_included?: boolean
+          id?: string
+          last_payment_at?: string | null
+          lead_id?: string
+          monthly_amount?: number
+          next_payment_at?: string | null
+          notes?: string | null
+          offer_level?: string
+          options?: string[]
+          payment_status?: string
+          payment_type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_subscriptions_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: true
+            referencedRelation: "audit_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       diagnostics: {
         Row: {
           a_un_site: string
