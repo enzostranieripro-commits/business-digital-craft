@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Plus, FileText, Download, Trash2, Send, Eye, Copy, ArrowRightLeft } from "lucide-react";
+import { Plus, FileText, Download, Trash2, Eye, Copy, ArrowRightLeft } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
@@ -369,10 +369,6 @@ const AdminBillingTab = ({ leads, fetchAll }: Props) => {
     setGenerating(null);
   };
 
-  const handleSendByEmail = (invoice: Invoice) => {
-    const to = invoice.client_email || "";
-    window.open(`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(to)}`, "_blank");
-  };
 
   const filtered = invoices.filter(inv => {
     if (filterType !== "all" && inv.type !== filterType) return false;
@@ -482,9 +478,6 @@ const AdminBillingTab = ({ leads, fetchAll }: Props) => {
                       </Button>
                       <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleDownloadPDF(inv)} disabled={generating === inv.id} title="Télécharger PDF">
                         <Download className="size-3.5" />
-                      </Button>
-                      <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleSendByEmail(inv)} disabled={generating === inv.id} title="Envoyer par email">
-                        <Send className="size-3.5" />
                       </Button>
                       {inv.type === "devis" && inv.status !== "accepté" && (
                         <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleConvertToInvoice(inv)} title="Convertir en facture">
