@@ -290,6 +290,133 @@ export type Database = {
           },
         ]
       }
+      invoice_counters: {
+        Row: {
+          counter: number
+          id: string
+        }
+        Insert: {
+          counter?: number
+          id: string
+        }
+        Update: {
+          counter?: number
+          id?: string
+        }
+        Relationships: []
+      }
+      invoice_items: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          invoice_id: string
+          quantity: number
+          sort_order: number
+          total: number
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          invoice_id: string
+          quantity?: number
+          sort_order?: number
+          total?: number
+          unit_price?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          invoice_id?: string
+          quantity?: number
+          sort_order?: number
+          total?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoices: {
+        Row: {
+          client_address: string | null
+          client_email: string | null
+          client_name: string
+          client_phone: string | null
+          created_at: string
+          due_date: string | null
+          id: string
+          issue_date: string
+          lead_id: string | null
+          notes: string | null
+          number: string
+          payment_terms: string | null
+          status: string
+          total_ht: number
+          total_ttc: number
+          type: string
+          updated_at: string
+          validity_date: string | null
+        }
+        Insert: {
+          client_address?: string | null
+          client_email?: string | null
+          client_name: string
+          client_phone?: string | null
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          issue_date?: string
+          lead_id?: string | null
+          notes?: string | null
+          number: string
+          payment_terms?: string | null
+          status?: string
+          total_ht?: number
+          total_ttc?: number
+          type?: string
+          updated_at?: string
+          validity_date?: string | null
+        }
+        Update: {
+          client_address?: string | null
+          client_email?: string | null
+          client_name?: string
+          client_phone?: string | null
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          issue_date?: string
+          lead_id?: string | null
+          notes?: string | null
+          number?: string
+          payment_terms?: string | null
+          status?: string
+          total_ht?: number
+          total_ttc?: number
+          type?: string
+          updated_at?: string
+          validity_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "audit_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lead_notes: {
         Row: {
           content: string
@@ -441,6 +568,7 @@ export type Database = {
     }
     Functions: {
       check_payment_statuses: { Args: never; Returns: undefined }
+      next_invoice_number: { Args: { p_type: string }; Returns: string }
     }
     Enums: {
       [_ in never]: never

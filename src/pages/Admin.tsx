@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import {
   LayoutDashboard, Users, Briefcase, Server, Calendar, Package, BarChart3, Settings,
-  LogOut, Wifi, WifiOff, ChevronLeft, Bell, Search, FolderKanban, DollarSign
+  LogOut, Wifi, WifiOff, ChevronLeft, Bell, Search, FolderKanban, DollarSign, FileText
 } from "lucide-react";
 import AdminDashboardTab from "@/components/admin/AdminDashboardTab";
 import AdminLeadsTab from "@/components/admin/AdminLeadsTab";
@@ -16,8 +16,9 @@ import AdminDiagnosticsTab from "@/components/admin/AdminDiagnosticsTab";
 import AdminSettingsTab from "@/components/admin/AdminSettingsTab";
 import AdminProjectsTab from "@/components/admin/AdminProjectsTab";
 import AdminFinanceTab from "@/components/admin/AdminFinanceTab";
+import AdminBillingTab from "@/components/admin/AdminBillingTab";
 
-type Tab = "dashboard" | "leads" | "clients" | "hosting" | "bookings" | "offers" | "diagnostics" | "settings" | "projects" | "finance";
+type Tab = "dashboard" | "leads" | "clients" | "hosting" | "bookings" | "offers" | "diagnostics" | "settings" | "projects" | "finance" | "billing";
 
 const SIDEBAR_SECTIONS = [
   {
@@ -25,6 +26,7 @@ const SIDEBAR_SECTIONS = [
     items: [
       { id: "dashboard" as Tab, label: "Dashboard", icon: LayoutDashboard },
       { id: "finance" as Tab, label: "Finances", icon: DollarSign },
+      { id: "billing" as Tab, label: "Devis & Factures", icon: FileText },
     ],
   },
   {
@@ -233,6 +235,7 @@ const Admin = () => {
         <main className="flex-1 p-8 overflow-y-auto">
           {tab === "dashboard" && <AdminDashboardTab leads={leads} bookings={bookings} products={products} diagnostics={diagnostics} subscriptions={subscriptions} payments={payments} />}
           {tab === "finance" && <AdminFinanceTab subscriptions={subscriptions} payments={payments} leads={leads} fetchAll={fetchAll} />}
+          {tab === "billing" && <AdminBillingTab leads={leads} fetchAll={fetchAll} />}
           {tab === "leads" && <AdminLeadsTab leads={leads} fetchAll={fetchAll} />}
           {tab === "clients" && <AdminClientsTab leads={leads} bookings={bookings} products={products} subscriptions={subscriptions} fetchAll={fetchAll} />}
           {tab === "hosting" && <AdminHostingTab subscriptions={subscriptions} leads={leads} payments={payments} fetchAll={fetchAll} />}
