@@ -26,6 +26,7 @@ const SIDEBAR_SECTIONS = [
     items: [
       { id: "dashboard" as Tab, label: "Dashboard", icon: LayoutDashboard },
       { id: "finance" as Tab, label: "Finances", icon: DollarSign },
+      { id: "billing" as Tab, label: "Devis & Factures", icon: FileText },
     ],
   },
   {
