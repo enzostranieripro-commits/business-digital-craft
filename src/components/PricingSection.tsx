@@ -123,9 +123,13 @@ const PricingSection = () => {
               </div>
               <div className="bg-secondary/50 rounded-xl p-6 mb-6">
                 <p className="text-sm text-muted-foreground mb-2">Récapitulatif</p>
-                <p className="text-sm">Offre {offer.name} — {offer.monthly}€/mois</p>
+                <p className="text-sm">Offre {offer.name} — à partir de {offer.monthly}€/mois TTC</p>
+                <p className="text-sm text-muted-foreground">ou à partir de {offer.oneTime.toLocaleString("fr-FR")}€ achat unique TTC</p>
                 {offer.options.map((o, i) => selectedOptions[i] && <p key={o.name} className="text-sm text-muted-foreground">+ {o.name} — {o.monthly}€/mois</p>)}
-                <div className="border-t border-border mt-4 pt-4"><p className="text-2xl font-extrabold">{totalDisplay}</p></div>
+                <div className="border-t border-border mt-4 pt-4">
+                  <p className="text-xs text-muted-foreground mb-1">À partir de</p>
+                  <p className="text-2xl font-extrabold">{totalDisplay} <span className="text-sm font-normal text-muted-foreground">TTC</span></p>
+                </div>
               </div>
               <div className="flex justify-between">
                 <Button variant="outline" onClick={() => setStep(2)}><ArrowLeft className="size-4 mr-2" />Retour</Button>
