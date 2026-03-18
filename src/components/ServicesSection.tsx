@@ -5,9 +5,9 @@ import { useAuditModal } from "@/contexts/AuditModalContext";
 import SectionHeader from "./SectionHeader";
 
 const offers = [
-  { name: "Visibilité", tagline: "Landing page", price: "59€", icon: Globe, color: "visibility" as const, clients: 18, features: ["Page unique optimisée SEO", "Formulaire de contact", "Responsive mobile"], popular: false },
-  { name: "Autorité", tagline: "Site vitrine multi-pages", price: "119€", icon: Layers, color: "authority" as const, clients: 22, features: ["Jusqu'à 5 pages", "Blog intégré", "Google My Business"], popular: true },
-  { name: "Conversion", tagline: "Site e-commerce", price: "199€", icon: ShoppingCart, color: "conversion" as const, clients: 7, features: ["Boutique en ligne", "Paiement sécurisé", "Gestion des stocks"], popular: false },
+  { name: "Visibilité", tagline: "Landing page", monthly: 59, oneTime: 1200, icon: Globe, color: "visibility" as const, clients: 18, features: ["Page unique optimisée SEO", "Formulaire de contact", "Responsive mobile"], popular: false },
+  { name: "Autorité", tagline: "Site vitrine multi-pages", monthly: 119, oneTime: 2400, icon: Layers, color: "authority" as const, clients: 22, features: ["Jusqu'à 5 pages", "Blog intégré", "Google My Business"], popular: true },
+  { name: "Conversion", tagline: "Site e-commerce", monthly: 199, oneTime: 3400, icon: ShoppingCart, color: "conversion" as const, clients: 7, features: ["Boutique en ligne", "Paiement sécurisé", "Gestion des stocks"], popular: false },
 ];
 
 const colorClasses = {
@@ -40,10 +40,12 @@ const ServicesSection = () => {
                   ))}
                 </ul>
                 <p className="text-xs text-muted-foreground mb-1">{o.clients} clients actifs</p>
-                <div className="flex items-baseline gap-1 mb-4">
-                  <span className="text-2xl font-extrabold">{o.price}</span>
-                  <span className="text-sm text-muted-foreground">/mois</span>
+                <p className="text-xs text-muted-foreground mb-0.5">À partir de</p>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-2xl font-extrabold">{o.monthly}€</span>
+                  <span className="text-sm text-muted-foreground">/mois TTC</span>
                 </div>
+                <p className="text-sm font-semibold text-muted-foreground mb-4">ou à partir de {o.oneTime.toLocaleString("fr-FR")}€ achat unique TTC</p>
                 <Button className={`w-full rounded-xl ${c.btn} text-white`} onClick={() => open(o.name)}>Demander un audit</Button>
               </motion.div>
             );
