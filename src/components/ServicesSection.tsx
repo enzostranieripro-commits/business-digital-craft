@@ -5,15 +5,15 @@ import { useAuditModal } from "@/contexts/AuditModalContext";
 import SectionHeader from "./SectionHeader";
 
 const offers = [
-  { name: "Visibilité", tagline: "Landing page", monthly: 59, oneTime: 1200, icon: Globe, color: "visibility" as const, clients: 18, features: ["Page unique optimisée SEO", "Formulaire de contact", "Responsive mobile"], popular: false },
-  { name: "Autorité", tagline: "Site vitrine multi-pages", monthly: 119, oneTime: 2400, icon: Layers, color: "authority" as const, clients: 22, features: ["Jusqu'à 5 pages", "Blog intégré", "Google My Business"], popular: true },
-  { name: "Conversion", tagline: "Site e-commerce", monthly: 199, oneTime: 3400, icon: ShoppingCart, color: "conversion" as const, clients: 7, features: ["Boutique en ligne", "Paiement sécurisé", "Gestion des stocks"], popular: false },
-];
+{ name: "Visibilité", tagline: "Landing page", monthly: 59, oneTime: 1200, icon: Globe, color: "visibility" as const, clients: 18, features: ["Page unique optimisée SEO", "Formulaire de contact", "Responsive mobile"], popular: false },
+{ name: "Autorité", tagline: "Site vitrine multi-pages", monthly: 119, oneTime: 2400, icon: Layers, color: "authority" as const, clients: 22, features: ["Jusqu'à 5 pages", "Blog intégré", "Google My Business"], popular: true },
+{ name: "Conversion", tagline: "Site e-commerce", monthly: 199, oneTime: 3400, icon: ShoppingCart, color: "conversion" as const, clients: 7, features: ["Boutique en ligne", "Paiement sécurisé", "Gestion des stocks"], popular: false }];
+
 
 const colorClasses = {
   visibility: { bg: "bg-visibility/10", text: "text-visibility", bar: "bg-visibility", btn: "bg-visibility hover:bg-visibility/90" },
   authority: { bg: "bg-primary/10", text: "text-primary", bar: "bg-primary", btn: "bg-primary hover:bg-primary/90" },
-  conversion: { bg: "bg-conversion/10", text: "text-conversion", bar: "bg-conversion", btn: "bg-conversion hover:bg-conversion/90" },
+  conversion: { bg: "bg-conversion/10", text: "text-conversion", bar: "bg-conversion", btn: "bg-conversion hover:bg-conversion/90" }
 };
 
 const ServicesSection = () => {
@@ -35,11 +35,11 @@ const ServicesSection = () => {
                 <h3 className="font-bold text-xl">{o.name}</h3>
                 <p className={`text-sm ${c.text} font-medium mb-4`}>{o.tagline}</p>
                 <ul className="space-y-2 mb-6">
-                  {o.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm"><Check className={`size-4 ${c.text}`} />{f}</li>
-                  ))}
+                  {o.features.map((f) =>
+                  <li key={f} className="flex items-center gap-2 text-sm"><Check className={`size-4 ${c.text}`} />{f}</li>
+                  )}
                 </ul>
-                <p className="text-xs text-muted-foreground mb-1">{o.clients} clients actifs</p>
+                
                 <p className="text-xs text-muted-foreground mb-0.5">À partir de</p>
                 <div className="flex items-baseline gap-1">
                   <span className="text-2xl font-extrabold">{o.monthly}€</span>
@@ -47,14 +47,14 @@ const ServicesSection = () => {
                 </div>
                 <p className="text-sm font-semibold text-muted-foreground mb-4">ou à partir de {o.oneTime.toLocaleString("fr-FR")}€ TTC</p>
                 <Button className={`w-full rounded-xl ${c.btn} text-white`} onClick={() => open(o.name)}>Demander un audit</Button>
-              </motion.div>
-            );
+              </motion.div>);
+
           })}
         </div>
         <p className="text-center text-sm text-muted-foreground mt-8"><span className="font-semibold text-foreground">47 entreprises</span> nous ont déjà fait confiance</p>
       </div>
-    </section>
-  );
+    </section>);
+
 };
 
 export default ServicesSection;
