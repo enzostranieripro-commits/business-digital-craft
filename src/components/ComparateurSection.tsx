@@ -77,7 +77,7 @@ const ComparateurSection = () => {
             </table>
           </div>
           <div className="p-6 text-center border-t border-border/20">
-            <button onClick={open} className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-6 py-3 rounded-xl hover:bg-primary/90 transition-colors">
+            <button onClick={() => open()} className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-6 py-3 rounded-xl hover:bg-primary/90 transition-colors">
               Obtenir mon audit gratuit
             </button>
           </div>
