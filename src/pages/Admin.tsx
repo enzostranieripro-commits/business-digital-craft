@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import {
   LayoutDashboard, Users, Briefcase, Server, Calendar, Package, BarChart3, Settings,
-  LogOut, Wifi, WifiOff, ChevronLeft, Bell, Search, FolderKanban, DollarSign
+  LogOut, Wifi, WifiOff, ChevronLeft, Bell, Search, FolderKanban, DollarSign, FileText
 } from "lucide-react";
 import AdminDashboardTab from "@/components/admin/AdminDashboardTab";
 import AdminLeadsTab from "@/components/admin/AdminLeadsTab";
