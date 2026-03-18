@@ -97,6 +97,10 @@ const Admin = () => {
           <AdminLeadsTab leads={leads} fetchAll={fetchAll} />
         )}
 
+        {tab === "clients" && (
+          <AdminClientsTab leads={leads} bookings={bookings} products={products} />
+        )}
+
         {tab === "bookings" && (
           <div>
             <h1 className="text-2xl font-bold mb-6">Rendez-vous</h1>
