@@ -56,22 +56,29 @@ const PricingSection = () => {
 
         <AnimatePresence mode="wait">
           {step === 0 && (
-            <motion.div key="s0" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="grid md:grid-cols-3 gap-4">
-              {offersData.map((o, i) => (
-                <button key={o.name} onClick={() => { setSelectedOffer(i); setSelectedOptions([false, false, false, false]); setStep(1); }}
-                  className={`card-surface p-6 text-left transition-all hover:scale-[1.02] ${selectedOffer === i ? "ring-2 ring-primary" : ""}`}>
-                  <div className={`h-1 rounded-full mb-4 ${o.color === "visibility" ? "bg-visibility" : o.color === "authority" ? "bg-primary" : "bg-conversion"}`} />
-                  <o.icon className={`size-6 mb-2 ${o.color === "visibility" ? "text-visibility" : o.color === "authority" ? "text-primary" : "text-conversion"}`} />
-                  <h3 className="font-bold text-lg">{o.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-3">{o.tagline}</p>
-                  <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">À partir de</p>
-                    <p className="text-2xl font-extrabold">{o.monthly}€<span className="text-sm font-normal text-muted-foreground">/mois TTC</span></p>
-                    <p className="text-sm font-semibold text-muted-foreground">ou {o.oneTime.toLocaleString("fr-FR")}€ <span className="text-xs font-normal">achat unique TTC</span></p>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-2">{o.users} clients actifs</p>
-                </button>
-              ))}
+            <motion.div key="s0" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="grid md:grid-cols-3 gap-6">
+              {offersData.map((o, i) => {
+                const colorMap = { visibility: { bg: "bg-visibility/10", text: "text-visibility" }, authority: { bg: "bg-primary/10", text: "text-primary" }, conversion: { bg: "bg-conversion/10", text: "text-conversion" } };
+                const c = colorMap[o.color as keyof typeof colorMap];
+                return (
+                  <button key={o.name} onClick={() => { setSelectedOffer(i); setSelectedOptions([false, false, false, false]); setStep(1); }}
+                    className={`card-surface p-6 text-left transition-all hover:scale-[1.02] border ${selectedOffer === i ? "ring-2 ring-primary border-primary" : "border-border"} relative`}>
+                    {o.color === "authority" && <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full">Le plus choisi</span>}
+                    <div className={`w-12 h-12 rounded-xl ${c.bg} flex items-center justify-center mb-4`}>
+                      <o.icon className={`size-6 ${c.text}`} />
+                    </div>
+                    <h3 className="font-bold text-xl">{o.name}</h3>
+                    <p className={`text-sm ${c.text} font-medium mb-4`}>{o.tagline}</p>
+                    <p className="text-xs text-muted-foreground mb-1">{o.users} clients actifs</p>
+                    <p className="text-xs text-muted-foreground mb-0.5">À partir de</p>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-2xl font-extrabold">{o.monthly}€</span>
+                      <span className="text-sm text-muted-foreground">/mois TTC</span>
+                    </div>
+                    <p className="text-sm font-semibold text-muted-foreground">ou à partir de {o.oneTime.toLocaleString("fr-FR")}€ TTC</p>
+                  </button>
+                );
+              })}
             </motion.div>
           )}
 
