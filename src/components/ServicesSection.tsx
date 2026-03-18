@@ -45,7 +45,7 @@ const ServicesSection = () => {
                   
                   <span className="text-sm text-muted-foreground">/mois TTC</span>
                 </div>
-                <p className="text-sm font-semibold text-muted-foreground mb-4">ou à partir de {o.oneTime.toLocaleString("fr-FR")}€ TTC</p>
+                
                 <Button className={`w-full rounded-xl ${c.btn} text-white`} onClick={() => open(o.name)}>Demander un audit</Button>
               </motion.div>);
 
