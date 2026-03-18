@@ -44,6 +44,7 @@ const AdminClientsTab = ({ leads, bookings, products, subscriptions, fetchAll }:
   const [notes, setNotes] = useState<any[]>([]);
   const [followUps, setFollowUps] = useState<any[]>([]);
   const [editingSub, setEditingSub] = useState(false);
+  const [offerPricing, setOfferPricing] = useState<Record<string, number>>({ "Visibilité": 297, "Autorité": 497, "Conversion": 797 });
   const [subForm, setSubForm] = useState({
     offer_level: "Visibilité",
     options: [] as string[],
@@ -53,6 +54,24 @@ const AdminClientsTab = ({ leads, bookings, products, subscriptions, fetchAll }:
     hosting_domain: "",
     notes: "",
   });
+
+  // Load pricing config
+  useEffect(() => {
+    const loadPricing = async () => {
+      const { data } = await supabase.from("admin_settings" as any).select("value").eq("key", "offer_pricing").single();
+      if (data) setOfferPricing(data.value as any);
+    };
+    loadPricing();
+  }, []);
+
+  // Auto-fill price when offer level changes
+  const handleOfferChange = (offer: string) => {
+    setSubForm(prev => ({
+      ...prev,
+      offer_level: offer,
+      monthly_amount: offerPricing[offer] || prev.monthly_amount,
+    }));
+  };
 
   const clients = useMemo(() => {
     return leads
