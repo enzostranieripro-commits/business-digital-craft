@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import {
-  Search, User, Mail, Phone, MapPin, Calendar, TrendingUp,
+  Search, User, Mail, Phone, MapPin, Calendar, TrendingUp, Pencil,
   ChevronRight, X, Save, Globe, CreditCard, Package
 } from "lucide-react";
 
