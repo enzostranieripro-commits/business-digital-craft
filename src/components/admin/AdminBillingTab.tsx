@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Plus, FileText, Download, Trash2, Send, Eye, Copy, ArrowRightLeft } from "lucide-react";
+import { Plus, FileText, Download, Trash2, Eye, Copy, ArrowRightLeft } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
