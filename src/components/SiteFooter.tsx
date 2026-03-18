@@ -28,7 +28,7 @@ const SiteFooter = () => {
         </div>
       </div>
       <div className="max-w-6xl mx-auto mt-12 pt-6 border-t border-border/30 flex flex-col md:flex-row justify-between items-center text-xs text-muted-foreground">
-        <p>© 2024 Studio Nova. Tous droits réservés.</p>
+        <p>© {new Date().getFullYear()} Angelot & Stranieri Consulting. Tous droits réservés.</p>
         <div className="flex gap-4 mt-2 md:mt-0">
           <a href="#" className="hover:text-foreground">Mentions légales</a>
           <a href="#" className="hover:text-foreground">Politique de confidentialité</a>

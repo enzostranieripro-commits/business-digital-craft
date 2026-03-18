@@ -27,8 +27,8 @@ const Navbar = () => {
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? "glass-strong py-3" : "py-5"}`}>
       <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between">
         <a href="#" className="flex items-center gap-2">
-          <span className="font-display text-xl font-extrabold tracking-tight text-foreground">
-            Studio<span className="text-primary">Nova</span>
+          <span className="font-display text-lg font-extrabold tracking-tight text-foreground">
+            Angelot & Stranieri<span className="text-primary"> Consulting</span>
           </span>
           <span className="w-2 h-2 rounded-full bg-primary animate-pulse-dot" />
         </a>

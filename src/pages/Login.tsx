@@ -48,7 +48,7 @@ const Login = () => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@studionova.fr"
+              placeholder="admin@asconsulting.fr"
               required
             />
           </div>

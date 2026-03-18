@@ -122,7 +122,7 @@ const Admin = () => {
                 <span className="text-primary font-display text-sm font-extrabold">S</span>
               </div>
               <div>
-                <p className="font-display text-sm font-extrabold leading-none">Studio<span className="text-primary">Nova</span></p>
+                <p className="font-display text-xs font-extrabold leading-none">AS<span className="text-primary"> Consulting</span></p>
                 <p className="text-[10px] text-muted-foreground mt-0.5">Back-office</p>
               </div>
             </div>
