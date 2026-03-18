@@ -99,6 +99,20 @@ const AdminClientsTab = ({ leads, bookings, products, subscriptions, fetchAll }:
     if (f.data) setFollowUps(f.data);
   };
 
+  const saveContact = async () => {
+    if (!selectedClient) return;
+    await supabase.from("audit_requests").update({
+      prenom: contactForm.prenom.trim(),
+      nom: contactForm.nom.trim(),
+      email: contactForm.email.trim(),
+      telephone: contactForm.telephone.trim() || null,
+      secteur: contactForm.secteur.trim(),
+    } as any).eq("id", selectedClient.id);
+    setEditingContact(false);
+    toast("Informations mises à jour ✓");
+    fetchAll();
+  };
+
   const toggleOption = (opt: string) => {
     setSubForm(prev => ({ ...prev, options: prev.options.includes(opt) ? prev.options.filter(o => o !== opt) : [...prev.options, opt] }));
   };
