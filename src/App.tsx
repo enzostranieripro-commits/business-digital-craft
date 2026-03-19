@@ -14,6 +14,9 @@ const Login = lazy(() => import("./pages/Login"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const MentionsLegales = lazy(() => import("./pages/MentionsLegales"));
+const CGV = lazy(() => import("./pages/CGV"));
+const PolitiqueConfidentialite = lazy(() => import("./pages/PolitiqueConfidentialite"));
 
 const queryClient = new QueryClient();
 
@@ -36,6 +39,9 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/mentions-legales" element={<MentionsLegales />} />
+              <Route path="/cgv" element={<CGV />} />
+              <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
               <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>

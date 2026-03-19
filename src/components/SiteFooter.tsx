@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useAuditModal } from "@/contexts/AuditModalContext";
 
 const SiteFooter = () => {
@@ -30,9 +31,9 @@ const SiteFooter = () => {
       <div className="max-w-6xl mx-auto mt-12 pt-6 border-t border-border/30 flex flex-col md:flex-row justify-between items-center text-xs text-muted-foreground">
         <p>© {new Date().getFullYear()} Angelot & Stranieri Consulting. Tous droits réservés.</p>
         <div className="flex gap-4 mt-2 md:mt-0">
-          <a href="#" className="hover:text-foreground">Mentions légales</a>
-          <a href="#" className="hover:text-foreground">Politique de confidentialité</a>
-          <a href="#" className="hover:text-foreground">CGV</a>
+          <Link to="/mentions-legales" className="hover:text-foreground transition-colors">Mentions légales</Link>
+          <Link to="/politique-confidentialite" className="hover:text-foreground transition-colors">Politique de confidentialité</Link>
+          <Link to="/cgv" className="hover:text-foreground transition-colors">CGV</Link>
         </div>
       </div>
     </footer>
