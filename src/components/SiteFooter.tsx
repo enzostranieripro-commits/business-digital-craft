@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useAuditModal } from "@/contexts/AuditModalContext";
 
 const SiteFooter = () => {
