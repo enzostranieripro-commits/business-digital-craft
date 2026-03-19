@@ -26,6 +26,8 @@ interface AdminLeadsTabProps {
 const AdminLeadsTab = ({ leads, fetchAll }: AdminLeadsTabProps) => {
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const [selectedLead, setSelectedLead] = useState<any | null>(null);
   const [notes, setNotes] = useState<any[]>([]);
   const [followUps, setFollowUps] = useState<any[]>([]);
@@ -38,7 +40,10 @@ const AdminLeadsTab = ({ leads, fetchAll }: AdminLeadsTabProps) => {
   const filteredLeads = leads.filter((l: any) => {
     const matchSearch = `${l.prenom} ${l.nom} ${l.email} ${l.secteur}`.toLowerCase().includes(search.toLowerCase());
     const matchStatus = !filterStatus || (l.status || "nouveau") === filterStatus;
-    return matchSearch && matchStatus;
+    const leadDate = l.created_at?.slice(0, 10);
+    const matchDateFrom = !dateFrom || leadDate >= dateFrom;
+    const matchDateTo = !dateTo || leadDate <= dateTo;
+    return matchSearch && matchStatus && matchDateFrom && matchDateTo;
   });
 
   const kanbanColumns = useMemo(() => {
@@ -170,10 +175,28 @@ const AdminLeadsTab = ({ leads, fetchAll }: AdminLeadsTabProps) => {
           })}
         </div>
 
-        <div className="relative mb-4">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher par nom, email, secteur..."
-            className="w-full bg-secondary/50 rounded-xl pl-10 pr-4 py-2.5 text-sm outline-none border border-border/20 focus:border-primary/30 transition-colors" />
+        <div className="flex gap-3 mb-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher par nom, email, secteur..."
+              className="w-full bg-secondary/50 rounded-xl pl-10 pr-4 py-2.5 text-sm outline-none border border-border/20 focus:border-primary/30 transition-colors" />
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 bg-secondary/50 rounded-xl border border-border/20 px-3 py-1.5">
+              <CalendarClock className="size-3.5 text-muted-foreground" />
+              <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
+                className="bg-transparent text-xs outline-none w-[110px] text-foreground" />
+              <span className="text-muted-foreground text-xs">→</span>
+              <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
+                className="bg-transparent text-xs outline-none w-[110px] text-foreground" />
+            </div>
+            {(dateFrom || dateTo) && (
+              <button onClick={() => { setDateFrom(""); setDateTo(""); }}
+                className="text-muted-foreground hover:text-foreground p-1.5 rounded-lg hover:bg-secondary/50 transition-colors">
+                <X className="size-3.5" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* KANBAN VIEW */}

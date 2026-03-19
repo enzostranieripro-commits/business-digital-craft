@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Calendar, Clock, MapPin, Mail, Phone, User, ChevronLeft, ChevronRight, List, CalendarDays, Download } from "lucide-react";
+import { Calendar, Clock, MapPin, Mail, Phone, User, ChevronLeft, ChevronRight, List, CalendarDays, Download, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths, isToday, isSameDay } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -20,11 +20,26 @@ const AdminBookingsTab = ({ bookings, fetchAll }: Props) => {
   const [view, setView] = useState<"list" | "calendar">("calendar");
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [filterStatus, setFilterStatus] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
   const updateStatus = async (id: string, status: string) => {
     await supabase.from("bookings").update({ status } as any).eq("id", id);
     fetchAll();
   };
+
+  // Filtered bookings for list view
+  const filteredBookings = useMemo(() => {
+    return bookings.filter(b => {
+      const matchSearch = !search || `${b.prenom} ${b.nom} ${b.email} ${b.secteur}`.toLowerCase().includes(search.toLowerCase());
+      const matchStatus = !filterStatus || b.status === filterStatus;
+      const matchDateFrom = !dateFrom || b.date >= dateFrom;
+      const matchDateTo = !dateTo || b.date <= dateTo;
+      return matchSearch && matchStatus && matchDateFrom && matchDateTo;
+    });
+  }, [bookings, search, filterStatus, dateFrom, dateTo]);
 
   const pending = bookings.filter(b => b.status === "pending").length;
   const confirmed = bookings.filter(b => b.status === "confirmed").length;
@@ -248,22 +263,60 @@ const AdminBookingsTab = ({ bookings, fetchAll }: Props) => {
 
       {/* Table view */}
       {view === "list" && (
-        <div className="card-surface overflow-hidden rounded-xl">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border/20">
-                <th className="p-4 text-left text-xs text-muted-foreground font-medium">Client</th>
-                <th className="p-4 text-left text-xs text-muted-foreground font-medium">Date & Heure</th>
-                <th className="p-4 text-left text-xs text-muted-foreground font-medium">Contact</th>
-                <th className="p-4 text-left text-xs text-muted-foreground font-medium">Secteur</th>
-                <th className="p-4 text-left text-xs text-muted-foreground font-medium">Besoin</th>
-                <th className="p-4 text-left text-xs text-muted-foreground font-medium">Statut</th>
-              </tr>
-            </thead>
-            <tbody>
-              {bookings.length === 0 ? (
+        <>
+          {/* Filters for list view */}
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex gap-1.5">
+              <button onClick={() => setFilterStatus(null)}
+                className={`text-[11px] px-3 py-1.5 rounded-full font-medium transition-all ${!filterStatus ? "bg-primary/15 text-primary" : "bg-secondary/50 text-muted-foreground hover:text-foreground"}`}>
+                Tous ({bookings.length})
+              </button>
+              {Object.entries(STATUS_MAP).map(([key, s]) => {
+                const count = bookings.filter(b => b.status === key).length;
+                return (
+                  <button key={key} onClick={() => setFilterStatus(filterStatus === key ? null : key)}
+                    className={`text-[11px] px-3 py-1.5 rounded-full font-medium transition-all ${filterStatus === key ? s.class : "bg-secondary/50 text-muted-foreground hover:text-foreground"}`}>
+                    {s.label} ({count})
+                  </button>
+                );
+              })}
+            </div>
+            <div className="flex-1 relative min-w-[200px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher..."
+                className="w-full bg-secondary/50 rounded-xl pl-9 pr-4 py-2 text-xs outline-none border border-border/20 focus:border-primary/30 transition-colors" />
+            </div>
+            <div className="flex items-center gap-1.5 bg-secondary/50 rounded-xl border border-border/20 px-3 py-1.5">
+              <Calendar className="size-3.5 text-muted-foreground" />
+              <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
+                className="bg-transparent text-xs outline-none w-[110px] text-foreground" />
+              <span className="text-muted-foreground text-xs">→</span>
+              <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
+                className="bg-transparent text-xs outline-none w-[110px] text-foreground" />
+            </div>
+            {(dateFrom || dateTo || search || filterStatus) && (
+              <button onClick={() => { setDateFrom(""); setDateTo(""); setSearch(""); setFilterStatus(null); }}
+                className="text-[11px] text-muted-foreground hover:text-foreground flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-secondary/50 transition-colors">
+                <X className="size-3" /> Réinitialiser
+              </button>
+            )}
+          </div>
+          <div className="card-surface overflow-hidden rounded-xl">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border/20">
+                  <th className="p-4 text-left text-xs text-muted-foreground font-medium">Client</th>
+                  <th className="p-4 text-left text-xs text-muted-foreground font-medium">Date & Heure</th>
+                  <th className="p-4 text-left text-xs text-muted-foreground font-medium">Contact</th>
+                  <th className="p-4 text-left text-xs text-muted-foreground font-medium">Secteur</th>
+                  <th className="p-4 text-left text-xs text-muted-foreground font-medium">Besoin</th>
+                  <th className="p-4 text-left text-xs text-muted-foreground font-medium">Statut</th>
+                </tr>
+              </thead>
+              <tbody>
+              {filteredBookings.length === 0 ? (
                 <tr><td colSpan={6} className="p-12 text-center text-muted-foreground">Aucun rendez-vous</td></tr>
-              ) : bookings.map((b: any) => {
+              ) : filteredBookings.map((b: any) => {
                 const st = STATUS_MAP[b.status] || STATUS_MAP.pending;
                 return (
                   <tr key={b.id} className="border-b border-border/10 hover:bg-secondary/20 transition-colors">
@@ -303,7 +356,8 @@ const AdminBookingsTab = ({ bookings, fetchAll }: Props) => {
               })}
             </tbody>
           </table>
-        </div>
+          </div>
+        </>
       )}
     </div>
   );
