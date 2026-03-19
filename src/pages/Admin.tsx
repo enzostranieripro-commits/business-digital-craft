@@ -221,13 +221,21 @@ const Admin = () => {
               {new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
             </p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             {hostingAlerts > 0 && (
               <button onClick={() => setTab("hosting")} className="flex items-center gap-2 text-xs bg-destructive/10 text-destructive px-3 py-1.5 rounded-full hover:bg-destructive/20 transition-colors animate-pulse">
                 <Bell className="size-3.5" />
                 {hostingAlerts} alerte{hostingAlerts > 1 ? "s" : ""} paiement
               </button>
             )}
+            <button onClick={() => setTab("dashboard")} className="relative p-2 rounded-xl hover:bg-secondary/50 transition-colors">
+              <Bell className="size-5 text-muted-foreground" />
+              {totalNotifs > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold px-1 animate-scale-in">
+                  {totalNotifs}
+                </span>
+              )}
+            </button>
             <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
               <span className="text-primary text-xs font-bold">A</span>
             </div>
