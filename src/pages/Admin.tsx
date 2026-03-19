@@ -19,8 +19,9 @@ import AdminProjectsTab from "@/components/admin/AdminProjectsTab";
 import AdminFinanceTab from "@/components/admin/AdminFinanceTab";
 import AdminBillingTab from "@/components/admin/AdminBillingTab";
 import AdminInvoiceSettingsTab from "@/components/admin/AdminInvoiceSettingsTab";
+import AdminHubspotTab from "@/components/admin/AdminHubspotTab";
 
-type Tab = "dashboard" | "leads" | "clients" | "hosting" | "bookings" | "offers" | "diagnostics" | "settings" | "projects" | "finance" | "billing" | "invoice_settings";
+type Tab = "dashboard" | "leads" | "clients" | "hosting" | "bookings" | "offers" | "diagnostics" | "settings" | "projects" | "finance" | "billing" | "invoice_settings" | "hubspot";
 
 const SIDEBAR_SECTIONS = [
   {
@@ -36,6 +37,7 @@ const SIDEBAR_SECTIONS = [
     label: "Commercial",
     items: [
       { id: "leads" as Tab, label: "Pipeline CRM", icon: Users },
+      { id: "hubspot" as Tab, label: "HubSpot CRM", icon: Briefcase },
       { id: "clients" as Tab, label: "Portefeuille Clients", icon: Briefcase },
       { id: "bookings" as Tab, label: "Rendez-vous", icon: Calendar },
     ],
@@ -398,6 +400,7 @@ const Admin = () => {
           {tab === "invoice_settings" && <AdminInvoiceSettingsTab />}
           {tab === "leads" && <AdminLeadsTab leads={leads} fetchAll={fetchAll} />}
           {tab === "clients" && <AdminClientsTab leads={leads} bookings={bookings} products={products} subscriptions={subscriptions} fetchAll={fetchAll} />}
+          {tab === "hubspot" && <AdminHubspotTab leads={leads} fetchAll={fetchAll} />}
           {tab === "hosting" && <AdminHostingTab subscriptions={subscriptions} leads={leads} payments={payments} fetchAll={fetchAll} />}
           {tab === "projects" && <AdminProjectsTab leads={leads} projects={projects} fetchAll={fetchAll} />}
           {tab === "bookings" && <AdminBookingsTab bookings={bookings} fetchAll={fetchAll} />}
