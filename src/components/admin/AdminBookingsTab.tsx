@@ -21,6 +21,7 @@ const AdminBookingsTab = ({ bookings, fetchAll }: Props) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
+  const [filterSecteur, setFilterSecteur] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
@@ -30,16 +31,19 @@ const AdminBookingsTab = ({ bookings, fetchAll }: Props) => {
     fetchAll();
   };
 
+  const secteurs = useMemo(() => [...new Set(bookings.map(b => b.secteur).filter(Boolean))].sort(), [bookings]);
+
   // Filtered bookings for list view
   const filteredBookings = useMemo(() => {
     return bookings.filter(b => {
       const matchSearch = !search || `${b.prenom} ${b.nom} ${b.email} ${b.secteur}`.toLowerCase().includes(search.toLowerCase());
       const matchStatus = !filterStatus || b.status === filterStatus;
+      const matchSecteur = !filterSecteur || b.secteur === filterSecteur;
       const matchDateFrom = !dateFrom || b.date >= dateFrom;
       const matchDateTo = !dateTo || b.date <= dateTo;
-      return matchSearch && matchStatus && matchDateFrom && matchDateTo;
+      return matchSearch && matchStatus && matchSecteur && matchDateFrom && matchDateTo;
     });
-  }, [bookings, search, filterStatus, dateFrom, dateTo]);
+  }, [bookings, search, filterStatus, filterSecteur, dateFrom, dateTo]);
 
   const pending = bookings.filter(b => b.status === "pending").length;
   const confirmed = bookings.filter(b => b.status === "confirmed").length;
@@ -286,6 +290,11 @@ const AdminBookingsTab = ({ bookings, fetchAll }: Props) => {
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher..."
                 className="w-full bg-secondary/50 rounded-xl pl-9 pr-4 py-2 text-xs outline-none border border-border/20 focus:border-primary/30 transition-colors" />
             </div>
+            <select value={filterSecteur || ""} onChange={e => setFilterSecteur(e.target.value || null)}
+              className="bg-secondary/50 rounded-xl border border-border/20 px-3 py-2 text-xs outline-none text-foreground min-w-[140px]">
+              <option value="">Tous secteurs</option>
+              {secteurs.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
             <div className="flex items-center gap-1.5 bg-secondary/50 rounded-xl border border-border/20 px-3 py-1.5">
               <Calendar className="size-3.5 text-muted-foreground" />
               <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
@@ -294,8 +303,8 @@ const AdminBookingsTab = ({ bookings, fetchAll }: Props) => {
               <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
                 className="bg-transparent text-xs outline-none w-[110px] text-foreground" />
             </div>
-            {(dateFrom || dateTo || search || filterStatus) && (
-              <button onClick={() => { setDateFrom(""); setDateTo(""); setSearch(""); setFilterStatus(null); }}
+            {(dateFrom || dateTo || search || filterStatus || filterSecteur) && (
+              <button onClick={() => { setDateFrom(""); setDateTo(""); setSearch(""); setFilterStatus(null); setFilterSecteur(null); }}
                 className="text-[11px] text-muted-foreground hover:text-foreground flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-secondary/50 transition-colors">
                 <X className="size-3" /> Réinitialiser
               </button>
