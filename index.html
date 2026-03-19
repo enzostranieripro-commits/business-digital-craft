@@ -4,9 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="canonical" href="https://asconsulting.fr/" />
     <title>Angelot & Stranieri Consulting — Agence Web en Aveyron & Occitanie</title>
     <meta name="description" content="Angelot & Stranieri Consulting crée des sites web performants pour artisans, commerçants et indépendants en Aveyron, Rodez, Millau et Occitanie. Audit gratuit, livraison en 7 jours." />
     <meta name="keywords" content="agence web Aveyron, création site internet Rodez, site web artisan Millau, agence digitale Occitanie, site vitrine commerçant, référencement local" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#7c3aed" />
     <meta name="geo.region" content="FR-12" />
     <meta name="geo.placename" content="Rodez" />
     <meta name="geo.position" content="44.3517;2.5753" />
@@ -15,11 +18,18 @@
     <meta property="og:description" content="Sites web performants pour artisans, commerçants et indépendants. Audit gratuit." />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="fr_FR" />
+    <meta property="og:url" content="https://asconsulting.fr/" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Angelot & Stranieri Consulting — Agence Web Aveyron & Occitanie" />
     <meta name="twitter:description" content="Sites web performants pour artisans et commerçants. Livraison en 7 jours." />
+    <!-- Preconnect & preload fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&display=swap" />
+    <!-- DNS prefetch for Supabase -->
+    <link rel="dns-prefetch" href="https://ptgcxwjoxtcanwwelizi.supabase.co" />
+    <link rel="preconnect" href="https://ptgcxwjoxtcanwwelizi.supabase.co" />
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -28,7 +38,14 @@
       "description": "Agence web spécialisée dans la création de sites internet pour artisans, commerçants et indépendants en Aveyron et Occitanie.",
       "areaServed": ["Aveyron", "Occitanie", "France"],
       "address": { "@type": "PostalAddress", "addressLocality": "Rodez", "addressRegion": "Occitanie", "postalCode": "12000", "addressCountry": "FR" },
-      "geo": { "@type": "GeoCoordinates", "latitude": 44.3517, "longitude": 2.5753 }
+      "geo": { "@type": "GeoCoordinates", "latitude": 44.3517, "longitude": 2.5753 },
+      "priceRange": "€€",
+      "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+        "opens": "09:00",
+        "closes": "18:00"
+      }
     }
     </script>
     <script type="application/ld+json">
@@ -37,6 +54,9 @@
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <p>Ce site nécessite JavaScript pour fonctionner correctement.</p>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
