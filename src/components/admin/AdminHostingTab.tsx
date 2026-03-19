@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
   Server, AlertTriangle, CheckCircle, XCircle, CreditCard, Globe,
-  Search, Bell, TrendingUp, Clock, ChevronRight, X, EyeOff
+  Search, Bell, TrendingUp, Clock, ChevronRight, X, EyeOff, Download
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
