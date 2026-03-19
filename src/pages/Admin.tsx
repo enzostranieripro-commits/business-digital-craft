@@ -400,6 +400,7 @@ const Admin = () => {
           {tab === "invoice_settings" && <AdminInvoiceSettingsTab />}
           {tab === "leads" && <AdminLeadsTab leads={leads} fetchAll={fetchAll} />}
           {tab === "clients" && <AdminClientsTab leads={leads} bookings={bookings} products={products} subscriptions={subscriptions} fetchAll={fetchAll} />}
+          {tab === "hubspot" && <AdminHubspotTab leads={leads} fetchAll={fetchAll} />}
           {tab === "hosting" && <AdminHostingTab subscriptions={subscriptions} leads={leads} payments={payments} fetchAll={fetchAll} />}
           {tab === "projects" && <AdminProjectsTab leads={leads} projects={projects} fetchAll={fetchAll} />}
           {tab === "bookings" && <AdminBookingsTab bookings={bookings} fetchAll={fetchAll} />}
