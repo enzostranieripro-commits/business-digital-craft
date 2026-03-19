@@ -1,8 +1,14 @@
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 
 const MentionsLegales = () => (
   <div className="min-h-screen bg-background text-foreground">
+    <Helmet>
+      <title>Mentions légales — Angelot & Stranieri Consulting</title>
+      <meta name="description" content="Mentions légales du site asconsulting.fr — Angelot & Stranieri Consulting, agence web à Rodez, Aveyron." />
+      <link rel="canonical" href="https://asconsulting.fr/mentions-legales" />
+    </Helmet>
     <div className="max-w-3xl mx-auto px-4 py-16">
       <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors">
         <ArrowLeft className="size-4" /> Retour au site
