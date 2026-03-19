@@ -20,11 +20,26 @@ const AdminBookingsTab = ({ bookings, fetchAll }: Props) => {
   const [view, setView] = useState<"list" | "calendar">("calendar");
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [filterStatus, setFilterStatus] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
   const updateStatus = async (id: string, status: string) => {
     await supabase.from("bookings").update({ status } as any).eq("id", id);
     fetchAll();
   };
+
+  // Filtered bookings for list view
+  const filteredBookings = useMemo(() => {
+    return bookings.filter(b => {
+      const matchSearch = !search || `${b.prenom} ${b.nom} ${b.email} ${b.secteur}`.toLowerCase().includes(search.toLowerCase());
+      const matchStatus = !filterStatus || b.status === filterStatus;
+      const matchDateFrom = !dateFrom || b.date >= dateFrom;
+      const matchDateTo = !dateTo || b.date <= dateTo;
+      return matchSearch && matchStatus && matchDateFrom && matchDateTo;
+    });
+  }, [bookings, search, filterStatus, dateFrom, dateTo]);
 
   const pending = bookings.filter(b => b.status === "pending").length;
   const confirmed = bookings.filter(b => b.status === "confirmed").length;
