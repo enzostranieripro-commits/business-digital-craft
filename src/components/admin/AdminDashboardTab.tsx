@@ -122,6 +122,8 @@ const AdminDashboardTab = ({ leads, bookings, products, diagnostics, subscriptio
       title: `Relance en retard — ${(f as any).audit_requests?.prenom} ${(f as any).audit_requests?.nom}`,
       sub: `Prévue le ${new Date(f.scheduled_at).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })} à ${new Date(f.scheduled_at).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}`,
       id: f.id,
+      action: () => onNavigate?.("leads"),
+      actionLabel: "Voir le lead",
     })),
     ...newLeadsRecent.map((l: any) => ({
       type: "info" as const,
@@ -129,6 +131,8 @@ const AdminDashboardTab = ({ leads, bookings, products, diagnostics, subscriptio
       title: `Nouveau lead — ${l.prenom} ${l.nom}`,
       sub: `${l.secteur} • ${l.email}`,
       id: l.id,
+      action: () => onNavigate?.("leads"),
+      actionLabel: "Ouvrir le pipeline",
     })),
     ...todayFollowUps.map((f: any) => ({
       type: "warning" as const,
@@ -136,6 +140,8 @@ const AdminDashboardTab = ({ leads, bookings, products, diagnostics, subscriptio
       title: `Relance aujourd'hui — ${(f as any).audit_requests?.prenom} ${(f as any).audit_requests?.nom}`,
       sub: `À ${new Date(f.scheduled_at).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })} • ${f.type}`,
       id: f.id,
+      action: () => onNavigate?.("leads"),
+      actionLabel: "Voir le lead",
     })),
     ...pendingBookings.slice(0, 3).map((b: any) => ({
       type: "warning" as const,
@@ -143,6 +149,8 @@ const AdminDashboardTab = ({ leads, bookings, products, diagnostics, subscriptio
       title: `RDV en attente — ${b.prenom} ${b.nom}`,
       sub: `${b.date} à ${b.time}`,
       id: b.id,
+      action: () => onNavigate?.("bookings"),
+      actionLabel: "Voir les RDV",
     })),
   ];
 
