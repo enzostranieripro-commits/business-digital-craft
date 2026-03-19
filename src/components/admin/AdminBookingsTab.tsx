@@ -121,6 +121,7 @@ const AdminBookingsTab = ({ bookings, fetchAll }: Props) => {
             </Button>
           </div>
         )}
+        </div>
       </div>
 
       {/* Calendar view */}
