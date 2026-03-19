@@ -108,7 +108,7 @@ const AdminBookingsTab = ({ bookings, fetchAll }: Props) => {
           }}>
             <Download className="size-3.5 mr-1.5" />Export CSV
           </Button>
-        {view === "calendar" && (
+          {view === "calendar" && (
           <div className="flex items-center gap-3">
             <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
               <ChevronLeft className="size-4" />
