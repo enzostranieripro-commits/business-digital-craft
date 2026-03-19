@@ -340,19 +340,81 @@ const AuditFormModal = () => {
               {/* STEP 2: Success */}
               {step === 2 && (
                 <motion.div key="step2" variants={stepVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.25 }}
-                  className="text-center py-6">
+                  className="text-center py-6 relative overflow-hidden">
+
+                  {/* Confetti burst */}
+                  <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                    {Array.from({ length: 40 }).map((_, i) => {
+                      const colors = [
+                        "hsl(265, 89%, 60%)", "hsl(158, 60%, 48%)", "hsl(35, 85%, 56%)",
+                        "#3b82f6", "#ec4899", "#f59e0b", "#06b6d4",
+                      ];
+                      const left = Math.random() * 100;
+                      const size = 4 + Math.random() * 8;
+                      const delay = Math.random() * 0.6;
+                      const duration = 1.5 + Math.random() * 1.5;
+                      const rotation = Math.random() * 720 - 360;
+                      const color = colors[i % colors.length];
+                      const shape = i % 3; // 0=square, 1=circle, 2=rectangle
+
+                      return (
+                        <motion.div
+                          key={i}
+                          initial={{ y: -20, x: 0, opacity: 1, rotate: 0, scale: 1 }}
+                          animate={{
+                            y: [0, 300 + Math.random() * 200],
+                            x: [0, (Math.random() - 0.5) * 150],
+                            opacity: [1, 1, 0],
+                            rotate: rotation,
+                            scale: [1, 0.5],
+                          }}
+                          transition={{ duration, delay, ease: "easeOut" }}
+                          style={{
+                            position: "absolute",
+                            left: `${left}%`,
+                            top: 0,
+                            width: shape === 2 ? size * 2 : size,
+                            height: size,
+                            backgroundColor: color,
+                            borderRadius: shape === 1 ? "50%" : shape === 0 ? "2px" : "1px",
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+
+                  {/* Radiating glow */}
+                  <motion.div
+                    initial={{ scale: 0, opacity: 0.6 }}
+                    animate={{ scale: [0, 3], opacity: [0.6, 0] }}
+                    transition={{ duration: 1, delay: 0.1 }}
+                    className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-visibility/30 pointer-events-none"
+                  />
+
                   <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 200, delay: 0.1 }}>
-                    <div className="w-20 h-20 rounded-full bg-visibility/15 flex items-center justify-center mx-auto mb-5">
-                      <CheckCircle className="size-10 text-visibility" />
-                    </div>
+                    <motion.div
+                      animate={{ boxShadow: ["0 0 0 0 hsl(158, 60%, 48%, 0.3)", "0 0 0 20px hsl(158, 60%, 48%, 0)", "0 0 0 0 hsl(158, 60%, 48%, 0)"] }}
+                      transition={{ duration: 1.5, delay: 0.3 }}
+                      className="w-20 h-20 rounded-full bg-visibility/15 flex items-center justify-center mx-auto mb-5"
+                    >
+                      <motion.div initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}>
+                        <CheckCircle className="size-10 text-visibility" />
+                      </motion.div>
+                    </motion.div>
                   </motion.div>
-                  <h3 className="text-xl font-display font-bold mb-2">Rendez-vous confirmé !</h3>
+
+                  <motion.h3 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+                    className="text-xl font-display font-bold mb-2">
+                    Rendez-vous confirmé ! 🎉
+                  </motion.h3>
                   {selectedDay && (
-                    <p className="text-muted-foreground mb-6">
+                    <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
+                      className="text-muted-foreground mb-6">
                       📅 {selectedDay.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })} à {selectedTime}
-                    </p>
+                    </motion.p>
                   )}
-                  <div className="bg-secondary/30 rounded-xl p-5 text-left max-w-xs mx-auto mb-6 border border-border/20">
+                  <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+                    className="bg-secondary/30 rounded-xl p-5 text-left max-w-xs mx-auto mb-6 border border-border/20">
                     <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Ce qui vous attend :</p>
                     <ul className="space-y-2.5">
                       {[
@@ -360,15 +422,19 @@ const AuditFormModal = () => {
                         "Recommandations personnalisées",
                         "Plan d'action concret",
                         "100% gratuit & sans engagement",
-                      ].map(t => (
-                        <li key={t} className="flex items-start gap-2 text-sm">
+                      ].map((t, i) => (
+                        <motion.li key={t} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.6 + i * 0.1 }}
+                          className="flex items-start gap-2 text-sm">
                           <CheckCircle className="size-4 text-visibility flex-shrink-0 mt-0.5" />
                           <span>{t}</span>
-                        </li>
+                        </motion.li>
                       ))}
                     </ul>
-                  </div>
-                  <Button variant="outline" onClick={handleClose} className="rounded-xl">Fermer</Button>
+                  </motion.div>
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}>
+                    <Button variant="outline" onClick={handleClose} className="rounded-xl">Fermer</Button>
+                  </motion.div>
                 </motion.div>
               )}
             </AnimatePresence>
