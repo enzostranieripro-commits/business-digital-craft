@@ -28,6 +28,7 @@ const RouteFallback = () => (
 );
 
 const App = () => (
+  <HelmetProvider>
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AuditModalProvider>
