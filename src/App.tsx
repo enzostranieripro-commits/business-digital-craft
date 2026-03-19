@@ -52,6 +52,7 @@ const App = () => (
       </AuditModalProvider>
     </TooltipProvider>
   </QueryClientProvider>
+  </HelmetProvider>
 );
 
 export default App;
