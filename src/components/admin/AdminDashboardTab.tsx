@@ -31,7 +31,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 const FUNNEL_COLORS = ["#3b82f6", "#f59e0b", COLORS.primary, COLORS.visibility];
 
-const AdminDashboardTab = ({ leads, bookings, products, diagnostics, subscriptions = [], payments = [] }: AdminDashboardTabProps) => {
+const AdminDashboardTab = ({ leads, bookings, products, diagnostics, subscriptions = [], payments = [], onNavigate }: AdminDashboardTabProps) => {
   const [followUps, setFollowUps] = useState<any[]>([]);
 
   useEffect(() => {
