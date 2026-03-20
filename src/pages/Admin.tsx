@@ -5,14 +5,13 @@ import { toast } from "sonner";
 import {
   LayoutDashboard, Users, Briefcase, Server, Calendar, Package, BarChart3, Settings,
   LogOut, Wifi, WifiOff, ChevronLeft, Bell, Search, FolderKanban, DollarSign, FileText,
-  Menu, X
+  Menu, X, Zap, Layers
 } from "lucide-react";
 import AdminDashboardTab from "@/components/admin/AdminDashboardTab";
 import AdminLeadsTab from "@/components/admin/AdminLeadsTab";
 import AdminClientsTab from "@/components/admin/AdminClientsTab";
 import AdminHostingTab from "@/components/admin/AdminHostingTab";
 import AdminBookingsTab from "@/components/admin/AdminBookingsTab";
-import AdminOffersTab from "@/components/admin/AdminOffersTab";
 import AdminDiagnosticsTab from "@/components/admin/AdminDiagnosticsTab";
 import AdminSettingsTab from "@/components/admin/AdminSettingsTab";
 import AdminProjectsTab from "@/components/admin/AdminProjectsTab";
@@ -20,8 +19,10 @@ import AdminFinanceTab from "@/components/admin/AdminFinanceTab";
 import AdminBillingTab from "@/components/admin/AdminBillingTab";
 import AdminInvoiceSettingsTab from "@/components/admin/AdminInvoiceSettingsTab";
 import AdminHubspotTab from "@/components/admin/AdminHubspotTab";
+import AdminCatalogTab from "@/components/admin/AdminCatalogTab";
+import AdminOffersTab from "@/components/admin/AdminOffersTab";
 
-type Tab = "dashboard" | "leads" | "clients" | "hosting" | "bookings" | "offers" | "diagnostics" | "settings" | "projects" | "finance" | "billing" | "invoice_settings" | "hubspot";
+type Tab = "dashboard" | "leads" | "clients" | "hosting" | "bookings" | "offers" | "diagnostics" | "settings" | "projects" | "finance" | "billing" | "invoice_settings" | "hubspot" | "catalog";
 
 const SIDEBAR_SECTIONS = [
   {
@@ -29,17 +30,29 @@ const SIDEBAR_SECTIONS = [
     items: [
       { id: "dashboard" as Tab, label: "Dashboard", icon: LayoutDashboard },
       { id: "finance" as Tab, label: "Finances", icon: DollarSign },
-      { id: "billing" as Tab, label: "Devis & Factures", icon: FileText },
-      { id: "invoice_settings" as Tab, label: "Réglages Devis", icon: Settings },
     ],
   },
   {
     label: "Commercial",
     items: [
       { id: "leads" as Tab, label: "Pipeline CRM", icon: Users },
-      { id: "hubspot" as Tab, label: "HubSpot CRM", icon: Briefcase },
       { id: "clients" as Tab, label: "Portefeuille Clients", icon: Briefcase },
       { id: "bookings" as Tab, label: "Rendez-vous", icon: Calendar },
+      { id: "hubspot" as Tab, label: "HubSpot CRM", icon: Zap },
+    ],
+  },
+  {
+    label: "Facturation",
+    items: [
+      { id: "billing" as Tab, label: "Devis & Factures", icon: FileText },
+      { id: "invoice_settings" as Tab, label: "Réglages Facturation", icon: Settings },
+    ],
+  },
+  {
+    label: "Produits & Tarifs",
+    items: [
+      { id: "catalog" as Tab, label: "Catalogue & Options", icon: Layers },
+      { id: "offers" as Tab, label: "Demandes Reçues", icon: Package },
     ],
   },
   {
@@ -47,7 +60,6 @@ const SIDEBAR_SECTIONS = [
     items: [
       { id: "hosting" as Tab, label: "Hébergement & Abo.", icon: Server },
       { id: "projects" as Tab, label: "Projets / Livrables", icon: FolderKanban },
-      { id: "offers" as Tab, label: "Demandes Produits", icon: Package },
       { id: "diagnostics" as Tab, label: "Diagnostics", icon: BarChart3 },
     ],
   },
@@ -404,6 +416,7 @@ const Admin = () => {
           {tab === "hosting" && <AdminHostingTab subscriptions={subscriptions} leads={leads} payments={payments} fetchAll={fetchAll} />}
           {tab === "projects" && <AdminProjectsTab leads={leads} projects={projects} fetchAll={fetchAll} />}
           {tab === "bookings" && <AdminBookingsTab bookings={bookings} fetchAll={fetchAll} />}
+          {tab === "catalog" && <AdminCatalogTab />}
           {tab === "offers" && <AdminOffersTab products={products} />}
           {tab === "diagnostics" && <AdminDiagnosticsTab diagnostics={diagnostics} />}
           {tab === "settings" && <AdminSettingsTab leads={leads} bookings={bookings} diagnostics={diagnostics} products={products} fetchAll={fetchAll} />}
