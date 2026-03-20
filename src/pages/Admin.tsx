@@ -416,6 +416,7 @@ const Admin = () => {
           {tab === "hosting" && <AdminHostingTab subscriptions={subscriptions} leads={leads} payments={payments} fetchAll={fetchAll} />}
           {tab === "projects" && <AdminProjectsTab leads={leads} projects={projects} fetchAll={fetchAll} />}
           {tab === "bookings" && <AdminBookingsTab bookings={bookings} fetchAll={fetchAll} />}
+          {tab === "catalog" && <AdminCatalogTab />}
           {tab === "offers" && <AdminOffersTab products={products} />}
           {tab === "diagnostics" && <AdminDiagnosticsTab diagnostics={diagnostics} />}
           {tab === "settings" && <AdminSettingsTab leads={leads} bookings={bookings} diagnostics={diagnostics} products={products} fetchAll={fetchAll} />}
