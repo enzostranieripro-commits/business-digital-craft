@@ -33,6 +33,8 @@ const FUNNEL_COLORS = ["#3b82f6", "#f59e0b", COLORS.primary, COLORS.visibility];
 
 const AdminDashboardTab = ({ leads, bookings, products, diagnostics, subscriptions = [], payments = [], onNavigate }: AdminDashboardTabProps) => {
   const [followUps, setFollowUps] = useState<any[]>([]);
+  const [invoices, setInvoices] = useState<any[]>([]);
+  const [emailsSentThisMonth, setEmailsSentThisMonth] = useState(0);
 
   useEffect(() => {
     const fetchFollowUps = async () => {
@@ -44,7 +46,24 @@ const AdminDashboardTab = ({ leads, bookings, products, diagnostics, subscriptio
         .limit(8);
       if (data) setFollowUps(data);
     };
+    const fetchInvoices = async () => {
+      const { data } = await supabase.from("invoices").select("*").order("created_at", { ascending: false });
+      if (data) setInvoices(data);
+    };
+    const fetchEmailCount = async () => {
+      const { data } = await supabase.from("admin_settings").select("value").eq("key", "resend_config").maybeSingle() as any;
+      if (data?.value?.logs) {
+        const now = new Date();
+        const thisMonth = data.value.logs.filter((l: any) => {
+          const d = new Date(l.date);
+          return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+        });
+        setEmailsSentThisMonth(thisMonth.length);
+      }
+    };
     fetchFollowUps();
+    fetchInvoices();
+    fetchEmailCount();
   }, [leads]);
 
   const leadsOverTime = useMemo(() => {
