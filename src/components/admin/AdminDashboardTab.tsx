@@ -120,6 +120,7 @@ const AdminDashboardTab = ({ leads, bookings, products, diagnostics, subscriptio
     .reduce((acc: number, s: any) => acc + (Number(s.monthly_amount) || 0), 0);
   const hostingCount = subscriptions.filter((s: any) => s.hosting_included).length;
   const paymentAlerts = subscriptions.filter((s: any) => s.payment_status === "retard" || s.payment_status === "impaye").length;
+  const devisEnAttente = invoices.filter((i: any) => i.type === "devis" && (i.status === "envoyé" || i.status === "brouillon") && new Date(i.created_at) < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length;
 
   const isOverdue = (date: string) => new Date(date) < new Date();
   const isToday = (date: string) => new Date(date).toDateString() === new Date().toDateString();
