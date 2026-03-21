@@ -172,6 +172,18 @@ const AdminDashboardTab = ({ leads, bookings, products, diagnostics, subscriptio
       action: () => onNavigate?.("bookings"),
       actionLabel: "Voir les RDV",
     })),
+    ...invoices
+      .filter((i: any) => i.type === "devis" && (i.status === "envoyé" || i.status === "brouillon") && new Date(i.created_at) < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
+      .slice(0, 3)
+      .map((i: any) => ({
+        type: "warning" as const,
+        icon: <FileText className="size-4" />,
+        title: `Devis sans réponse — ${i.client_name}`,
+        sub: `${i.number} • ${Number(i.total_ttc).toLocaleString("fr-FR")}€ • envoyé il y a +7j`,
+        id: i.id,
+        action: () => onNavigate?.("resend"),
+        actionLabel: "Relancer via Resend",
+      })),
   ];
 
   const notifStyles = {
