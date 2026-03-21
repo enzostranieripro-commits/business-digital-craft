@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar } from "recharts";
-import { Clock, Phone, Mail, MessageSquare, TrendingUp, Users, Calendar, CreditCard, AlertTriangle, ArrowUpRight, ArrowDownRight, ExternalLink } from "lucide-react";
+import { Clock, Phone, Mail, MessageSquare, TrendingUp, Users, Calendar, CreditCard, AlertTriangle, ArrowUpRight, ArrowDownRight, ExternalLink, FileText, Send } from "lucide-react";
 
 interface AdminDashboardTabProps {
   leads: any[];
@@ -33,6 +33,8 @@ const FUNNEL_COLORS = ["#3b82f6", "#f59e0b", COLORS.primary, COLORS.visibility];
 
 const AdminDashboardTab = ({ leads, bookings, products, diagnostics, subscriptions = [], payments = [], onNavigate }: AdminDashboardTabProps) => {
   const [followUps, setFollowUps] = useState<any[]>([]);
+  const [invoices, setInvoices] = useState<any[]>([]);
+  const [emailsSentThisMonth, setEmailsSentThisMonth] = useState(0);
 
   useEffect(() => {
     const fetchFollowUps = async () => {
@@ -44,7 +46,24 @@ const AdminDashboardTab = ({ leads, bookings, products, diagnostics, subscriptio
         .limit(8);
       if (data) setFollowUps(data);
     };
+    const fetchInvoices = async () => {
+      const { data } = await supabase.from("invoices").select("*").order("created_at", { ascending: false });
+      if (data) setInvoices(data);
+    };
+    const fetchEmailCount = async () => {
+      const { data } = await supabase.from("admin_settings").select("value").eq("key", "resend_config").maybeSingle() as any;
+      if (data?.value?.logs) {
+        const now = new Date();
+        const thisMonth = data.value.logs.filter((l: any) => {
+          const d = new Date(l.date);
+          return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+        });
+        setEmailsSentThisMonth(thisMonth.length);
+      }
+    };
     fetchFollowUps();
+    fetchInvoices();
+    fetchEmailCount();
   }, [leads]);
 
   const leadsOverTime = useMemo(() => {
@@ -101,6 +120,7 @@ const AdminDashboardTab = ({ leads, bookings, products, diagnostics, subscriptio
     .reduce((acc: number, s: any) => acc + (Number(s.monthly_amount) || 0), 0);
   const hostingCount = subscriptions.filter((s: any) => s.hosting_included).length;
   const paymentAlerts = subscriptions.filter((s: any) => s.payment_status === "retard" || s.payment_status === "impaye").length;
+  const devisEnAttente = invoices.filter((i: any) => i.type === "devis" && (i.status === "envoyé" || i.status === "brouillon") && new Date(i.created_at) < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length;
 
   const isOverdue = (date: string) => new Date(date) < new Date();
   const isToday = (date: string) => new Date(date).toDateString() === new Date().toDateString();
@@ -152,6 +172,18 @@ const AdminDashboardTab = ({ leads, bookings, products, diagnostics, subscriptio
       action: () => onNavigate?.("bookings"),
       actionLabel: "Voir les RDV",
     })),
+    ...invoices
+      .filter((i: any) => i.type === "devis" && (i.status === "envoyé" || i.status === "brouillon") && new Date(i.created_at) < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
+      .slice(0, 3)
+      .map((i: any) => ({
+        type: "warning" as const,
+        icon: <FileText className="size-4" />,
+        title: `Devis sans réponse — ${i.client_name}`,
+        sub: `${i.number} • ${Number(i.total_ttc).toLocaleString("fr-FR")}€ • envoyé il y a +7j`,
+        id: i.id,
+        action: () => onNavigate?.("resend"),
+        actionLabel: "Relancer via Resend",
+      })),
   ];
 
   const notifStyles = {
@@ -208,13 +240,15 @@ const AdminDashboardTab = ({ leads, bookings, products, diagnostics, subscriptio
       )}
 
       {/* KPI Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-9 gap-3">
         {[
-          { label: "Total Leads", value: leads.length, icon: Users, color: "text-primary", bg: "bg-primary/10" },
+          { label: "Total Prospects", value: leads.length, icon: Users, color: "text-primary", bg: "bg-primary/10" },
           { label: "Conversion", value: `${convRate}%`, icon: TrendingUp, color: "text-conversion", bg: "bg-conversion/10" },
           { label: "RDV confirmés", value: confirmedBookings, icon: Calendar, color: "text-visibility", bg: "bg-visibility/10" },
           { label: "MRR", value: `${totalMRR.toLocaleString("fr-FR")}€`, icon: CreditCard, color: "text-primary", bg: "bg-primary/10" },
           { label: "Hébergés", value: hostingCount, icon: TrendingUp, color: "text-visibility", bg: "bg-visibility/10" },
+          { label: "Devis en attente", value: devisEnAttente, icon: FileText, color: devisEnAttente > 0 ? "text-conversion" : "text-muted-foreground", bg: devisEnAttente > 0 ? "bg-conversion/10" : "bg-secondary" },
+          { label: "Emails ce mois", value: emailsSentThisMonth, icon: Send, color: "text-primary", bg: "bg-primary/10" },
           { label: "Relances", value: urgentFollowUps, icon: Clock, color: urgentFollowUps > 0 ? "text-conversion" : "text-muted-foreground", bg: urgentFollowUps > 0 ? "bg-conversion/10" : "bg-secondary" },
           { label: "Alertes paie.", value: paymentAlerts, icon: AlertTriangle, color: paymentAlerts > 0 ? "text-destructive" : "text-muted-foreground", bg: paymentAlerts > 0 ? "bg-destructive/10" : "bg-secondary" },
         ].map(k => (
