@@ -228,13 +228,15 @@ const AdminDashboardTab = ({ leads, bookings, products, diagnostics, subscriptio
       )}
 
       {/* KPI Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-9 gap-3">
         {[
-          { label: "Total Leads", value: leads.length, icon: Users, color: "text-primary", bg: "bg-primary/10" },
+          { label: "Total Prospects", value: leads.length, icon: Users, color: "text-primary", bg: "bg-primary/10" },
           { label: "Conversion", value: `${convRate}%`, icon: TrendingUp, color: "text-conversion", bg: "bg-conversion/10" },
           { label: "RDV confirmés", value: confirmedBookings, icon: Calendar, color: "text-visibility", bg: "bg-visibility/10" },
           { label: "MRR", value: `${totalMRR.toLocaleString("fr-FR")}€`, icon: CreditCard, color: "text-primary", bg: "bg-primary/10" },
           { label: "Hébergés", value: hostingCount, icon: TrendingUp, color: "text-visibility", bg: "bg-visibility/10" },
+          { label: "Devis en attente", value: devisEnAttente, icon: FileText, color: devisEnAttente > 0 ? "text-conversion" : "text-muted-foreground", bg: devisEnAttente > 0 ? "bg-conversion/10" : "bg-secondary" },
+          { label: "Emails ce mois", value: emailsSentThisMonth, icon: Send, color: "text-primary", bg: "bg-primary/10" },
           { label: "Relances", value: urgentFollowUps, icon: Clock, color: urgentFollowUps > 0 ? "text-conversion" : "text-muted-foreground", bg: urgentFollowUps > 0 ? "bg-conversion/10" : "bg-secondary" },
           { label: "Alertes paie.", value: paymentAlerts, icon: AlertTriangle, color: paymentAlerts > 0 ? "text-destructive" : "text-muted-foreground", bg: paymentAlerts > 0 ? "bg-destructive/10" : "bg-secondary" },
         ].map(k => (
