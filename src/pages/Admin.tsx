@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import {
   LayoutDashboard, Users, Briefcase, Server, Calendar, Package, BarChart3, Settings,
   LogOut, Wifi, WifiOff, ChevronLeft, Bell, Search, FolderKanban, DollarSign, FileText,
-  Menu, X, Zap, Layers
+  Menu, X, Layers, Tag, RefreshCw, Send, Mail
 } from "lucide-react";
 import AdminDashboardTab from "@/components/admin/AdminDashboardTab";
 import AdminLeadsTab from "@/components/admin/AdminLeadsTab";
@@ -18,11 +18,13 @@ import AdminProjectsTab from "@/components/admin/AdminProjectsTab";
 import AdminFinanceTab from "@/components/admin/AdminFinanceTab";
 import AdminBillingTab from "@/components/admin/AdminBillingTab";
 import AdminInvoiceSettingsTab from "@/components/admin/AdminInvoiceSettingsTab";
-import AdminHubspotTab from "@/components/admin/AdminHubspotTab";
-import AdminCatalogTab from "@/components/admin/AdminCatalogTab";
+import AdminOffresPacksTab from "@/components/admin/AdminOffresPacksTab";
+import AdminOptionsTab from "@/components/admin/AdminOptionsTab";
+import AdminAbonnementsTab from "@/components/admin/AdminAbonnementsTab";
 import AdminOffersTab from "@/components/admin/AdminOffersTab";
+import AdminResendTab from "@/components/admin/AdminResendTab";
 
-type Tab = "dashboard" | "leads" | "clients" | "hosting" | "bookings" | "offers" | "diagnostics" | "settings" | "projects" | "finance" | "billing" | "invoice_settings" | "hubspot" | "catalog";
+type Tab = "dashboard" | "leads" | "clients" | "hosting" | "bookings" | "offers" | "diagnostics" | "settings" | "projects" | "finance" | "billing" | "invoice_settings" | "offres_packs" | "options_tarifs" | "abonnements" | "resend";
 
 const SIDEBAR_SECTIONS = [
   {
@@ -35,10 +37,9 @@ const SIDEBAR_SECTIONS = [
   {
     label: "Commercial",
     items: [
-      { id: "leads" as Tab, label: "Pipeline CRM", icon: Users },
-      { id: "clients" as Tab, label: "Portefeuille Clients", icon: Briefcase },
+      { id: "leads" as Tab, label: "Prospects", icon: Users },
+      { id: "clients" as Tab, label: "Clients", icon: Briefcase },
       { id: "bookings" as Tab, label: "Rendez-vous", icon: Calendar },
-      { id: "hubspot" as Tab, label: "HubSpot CRM", icon: Zap },
     ],
   },
   {
@@ -49,23 +50,31 @@ const SIDEBAR_SECTIONS = [
     ],
   },
   {
-    label: "Produits & Tarifs",
+    label: "Catalogue",
     items: [
-      { id: "catalog" as Tab, label: "Catalogue & Options", icon: Layers },
-      { id: "offers" as Tab, label: "Demandes Reçues", icon: Package },
+      { id: "offres_packs" as Tab, label: "Offres & Packs", icon: Package },
+      { id: "options_tarifs" as Tab, label: "Options & Tarifs", icon: Tag },
+      { id: "abonnements" as Tab, label: "Abonnements Récurrents", icon: RefreshCw },
     ],
   },
   {
     label: "Exploitation",
     items: [
       { id: "hosting" as Tab, label: "Hébergement & Abo.", icon: Server },
-      { id: "projects" as Tab, label: "Projets / Livrables", icon: FolderKanban },
-      { id: "diagnostics" as Tab, label: "Diagnostics", icon: BarChart3 },
+      { id: "projects" as Tab, label: "Projets", icon: FolderKanban },
+      { id: "offers" as Tab, label: "Demandes Reçues", icon: Layers },
+    ],
+  },
+  {
+    label: "Communication",
+    items: [
+      { id: "resend" as Tab, label: "Resend", icon: Mail },
     ],
   },
   {
     label: "Système",
     items: [
+      { id: "diagnostics" as Tab, label: "Diagnostics", icon: BarChart3 },
       { id: "settings" as Tab, label: "Paramètres", icon: Settings },
     ],
   },
@@ -93,7 +102,6 @@ const Admin = () => {
   const [projects, setProjects] = useState<any[]>([]);
   const [connected, setConnected] = useState(true);
 
-  // Global search
   const [globalSearch, setGlobalSearch] = useState("");
   const [searchFocused, setSearchFocused] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
@@ -102,43 +110,23 @@ const Admin = () => {
     if (!globalSearch.trim() || globalSearch.length < 2) return [];
     const q = globalSearch.toLowerCase();
     const results: SearchResult[] = [];
-
     leads.forEach(l => {
       const text = `${l.prenom} ${l.nom} ${l.email} ${l.secteur}`.toLowerCase();
       if (text.includes(q)) {
         const isClient = l.status === "converti";
-        results.push({
-          type: isClient ? "client" : "lead",
-          label: `${l.prenom} ${l.nom}`,
-          sub: `${l.email} • ${l.secteur}`,
-          tab: isClient ? "clients" : "leads",
-          id: l.id,
-        });
+        results.push({ type: isClient ? "client" : "lead", label: `${l.prenom} ${l.nom}`, sub: `${l.email} • ${l.secteur}`, tab: isClient ? "clients" : "leads", id: l.id });
       }
     });
-
     bookings.forEach(b => {
       const text = `${b.prenom} ${b.nom} ${b.email} ${b.date}`.toLowerCase();
-      if (text.includes(q)) {
-        results.push({
-          type: "booking",
-          label: `${b.prenom} ${b.nom}`,
-          sub: `RDV ${b.date} à ${b.time}`,
-          tab: "bookings",
-          id: b.id,
-        });
-      }
+      if (text.includes(q)) results.push({ type: "booking", label: `${b.prenom} ${b.nom}`, sub: `RDV ${b.date} à ${b.time}`, tab: "bookings", id: b.id });
     });
-
     return results.slice(0, 8);
   }, [globalSearch, leads, bookings]);
 
-  // Close search on click outside
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
-        setSearchFocused(false);
-      }
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) setSearchFocused(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -198,7 +186,6 @@ const Admin = () => {
 
   const sidebarContent = (
     <>
-      {/* Nav */}
       <nav className="flex-1 py-4 overflow-y-auto">
         {SIDEBAR_SECTIONS.map((section) => (
           <div key={section.label} className="mb-4">
@@ -248,13 +235,9 @@ const Admin = () => {
         ))}
       </nav>
 
-      {/* Footer */}
       <div className={`border-t border-border/20 ${sidebarCollapsed ? "p-2" : "p-4"}`}>
         <div className={`flex items-center ${sidebarCollapsed ? "justify-center" : "gap-2"}`}>
-          {connected
-            ? <Wifi className="size-3.5 text-visibility flex-shrink-0" />
-            : <WifiOff className="size-3.5 text-destructive flex-shrink-0" />
-          }
+          {connected ? <Wifi className="size-3.5 text-visibility flex-shrink-0" /> : <WifiOff className="size-3.5 text-destructive flex-shrink-0" />}
           {!sidebarCollapsed && (
             <span className={`text-[11px] ${connected ? "text-visibility" : "text-destructive"}`}>
               {connected ? "Connecté en temps réel" : "Déconnecté"}
@@ -277,7 +260,6 @@ const Admin = () => {
     <div className="min-h-screen bg-background flex">
       {/* Desktop Sidebar */}
       <aside className={`${sidebarCollapsed ? "w-[68px]" : "w-[260px]"} border-r border-border/20 hidden md:flex flex-col flex-shrink-0 transition-all duration-300 bg-card/50`}>
-        {/* Brand */}
         <div className={`h-16 flex items-center ${sidebarCollapsed ? "justify-center px-2" : "px-5"} border-b border-border/20`}>
           {!sidebarCollapsed && (
             <div className="flex items-center gap-2.5 flex-1">
@@ -285,7 +267,7 @@ const Admin = () => {
                 <span className="text-primary font-display text-xs font-extrabold">AS</span>
               </div>
               <div>
-                <p className="font-display text-xs font-extrabold leading-none">AS<span className="text-primary"> Consulting</span></p>
+                <p className="font-display text-xs font-extrabold leading-none">AS<span className="text-primary"> C&D</span></p>
                 <p className="text-[10px] text-muted-foreground mt-0.5">Back-office</p>
               </div>
             </div>
@@ -307,7 +289,7 @@ const Admin = () => {
                 <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
                   <span className="text-primary font-display text-xs font-extrabold">AS</span>
                 </div>
-                <p className="font-display text-xs font-extrabold leading-none">AS<span className="text-primary"> Consulting</span></p>
+                <p className="font-display text-xs font-extrabold leading-none">AS<span className="text-primary"> C&D</span></p>
               </div>
               <button onClick={() => setMobileMenuOpen(false)} className="p-1.5 rounded-lg hover:bg-secondary/50 text-muted-foreground">
                 <X className="size-5" />
@@ -320,7 +302,6 @@ const Admin = () => {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top bar */}
         <header className="h-16 border-b border-border/20 flex items-center justify-between px-4 md:px-8 flex-shrink-0 bg-card/30 gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <button onClick={() => setMobileMenuOpen(true)} className="md:hidden p-1.5 rounded-lg hover:bg-secondary/50 text-muted-foreground">
@@ -334,43 +315,33 @@ const Admin = () => {
             </div>
           </div>
 
-          {/* Global search */}
           <div ref={searchRef} className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <input
               value={globalSearch}
               onChange={e => setGlobalSearch(e.target.value)}
               onFocus={() => setSearchFocused(true)}
-              placeholder="Rechercher un lead, client, RDV..."
+              placeholder="Rechercher un prospect, client, RDV..."
               className="w-full bg-secondary/50 rounded-xl pl-9 pr-4 py-2 text-sm outline-none border border-border/20 focus:border-primary/30 transition-colors"
             />
             {searchFocused && searchResults.length > 0 && (
               <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border/20 rounded-xl shadow-xl z-50 overflow-hidden">
                 {searchResults.map((r) => (
-                  <button
-                    key={`${r.type}-${r.id}`}
-                    onClick={() => handleSearchSelect(r)}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-secondary/30 transition-colors border-b border-border/10 last:border-0"
-                  >
+                  <button key={`${r.type}-${r.id}`} onClick={() => handleSearchSelect(r)}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-secondary/30 transition-colors border-b border-border/10 last:border-0">
                     <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                      r.type === "lead" ? "bg-primary/10 text-primary" :
-                      r.type === "client" ? "bg-visibility/10 text-visibility" :
-                      "bg-conversion/10 text-conversion"
+                      r.type === "lead" ? "bg-primary/10 text-primary" : r.type === "client" ? "bg-visibility/10 text-visibility" : "bg-conversion/10 text-conversion"
                     }`}>
-                      {r.type === "lead" ? <Users className="size-3.5" /> :
-                       r.type === "client" ? <Briefcase className="size-3.5" /> :
-                       <Calendar className="size-3.5" />}
+                      {r.type === "lead" ? <Users className="size-3.5" /> : r.type === "client" ? <Briefcase className="size-3.5" /> : <Calendar className="size-3.5" />}
                     </div>
                     <div className="min-w-0">
                       <p className="text-sm font-medium truncate">{r.label}</p>
                       <p className="text-[11px] text-muted-foreground truncate">{r.sub}</p>
                     </div>
                     <span className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full flex-shrink-0 ${
-                      r.type === "lead" ? "bg-primary/10 text-primary" :
-                      r.type === "client" ? "bg-visibility/10 text-visibility" :
-                      "bg-conversion/10 text-conversion"
+                      r.type === "lead" ? "bg-primary/10 text-primary" : r.type === "client" ? "bg-visibility/10 text-visibility" : "bg-conversion/10 text-conversion"
                     }`}>
-                      {r.type === "lead" ? "Lead" : r.type === "client" ? "Client" : "RDV"}
+                      {r.type === "lead" ? "Prospect" : r.type === "client" ? "Client" : "RDV"}
                     </span>
                   </button>
                 ))}
@@ -386,8 +357,7 @@ const Admin = () => {
           <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
             {hostingAlerts > 0 && (
               <button onClick={() => setTab("hosting")} className="hidden md:flex items-center gap-2 text-xs bg-destructive/10 text-destructive px-3 py-1.5 rounded-full hover:bg-destructive/20 transition-colors animate-pulse">
-                <Bell className="size-3.5" />
-                {hostingAlerts} alerte{hostingAlerts > 1 ? "s" : ""}
+                <Bell className="size-3.5" />{hostingAlerts} alerte{hostingAlerts > 1 ? "s" : ""}
               </button>
             )}
             <button onClick={() => setTab("dashboard")} className="relative p-2 rounded-xl hover:bg-secondary/50 transition-colors">
@@ -404,7 +374,6 @@ const Admin = () => {
           </div>
         </header>
 
-        {/* Content area */}
         <main className="flex-1 p-4 md:p-8 overflow-y-auto">
           {tab === "dashboard" && <AdminDashboardTab leads={leads} bookings={bookings} products={products} diagnostics={diagnostics} subscriptions={subscriptions} payments={payments} onNavigate={(t) => setTab(t as Tab)} />}
           {tab === "finance" && <AdminFinanceTab subscriptions={subscriptions} payments={payments} leads={leads} fetchAll={fetchAll} />}
@@ -412,12 +381,14 @@ const Admin = () => {
           {tab === "invoice_settings" && <AdminInvoiceSettingsTab />}
           {tab === "leads" && <AdminLeadsTab leads={leads} fetchAll={fetchAll} />}
           {tab === "clients" && <AdminClientsTab leads={leads} bookings={bookings} products={products} subscriptions={subscriptions} fetchAll={fetchAll} />}
-          {tab === "hubspot" && <AdminHubspotTab leads={leads} fetchAll={fetchAll} />}
           {tab === "hosting" && <AdminHostingTab subscriptions={subscriptions} leads={leads} payments={payments} fetchAll={fetchAll} />}
           {tab === "projects" && <AdminProjectsTab leads={leads} projects={projects} fetchAll={fetchAll} />}
           {tab === "bookings" && <AdminBookingsTab bookings={bookings} fetchAll={fetchAll} />}
-          {tab === "catalog" && <AdminCatalogTab />}
+          {tab === "offres_packs" && <AdminOffresPacksTab />}
+          {tab === "options_tarifs" && <AdminOptionsTab />}
+          {tab === "abonnements" && <AdminAbonnementsTab />}
           {tab === "offers" && <AdminOffersTab products={products} />}
+          {tab === "resend" && <AdminResendTab />}
           {tab === "diagnostics" && <AdminDiagnosticsTab diagnostics={diagnostics} />}
           {tab === "settings" && <AdminSettingsTab leads={leads} bookings={bookings} diagnostics={diagnostics} products={products} fetchAll={fetchAll} />}
         </main>
