@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Save, Plus, Trash2, Building2, FileText, Package, GripVertical } from "lucide-react";
+import { Save, Plus, Trash2, Building2, FileText, Package, GripVertical, Upload, Image } from "lucide-react";
 
 interface CompanyInfo {
   name: string;
@@ -16,6 +16,8 @@ interface CompanyInfo {
   phone: string;
   website: string;
   legal_form: string;
+  logo_url: string;
+  brand_color: string;
 }
 
 interface ServiceItem {
@@ -35,34 +37,36 @@ interface InvoiceLegal {
 }
 
 const DEFAULT_COMPANY: CompanyInfo = {
-  name: "AS Consulting",
-  subtitle: "Consulting",
+  name: "AS C&D",
+  subtitle: "Création de sites web & Copywriting",
   siret: "",
-  address: "",
-  email: "contact@asconsulting.fr",
+  address: "Rodez, France",
+  email: "contact@ascnd.fr",
   phone: "",
   website: "",
   legal_form: "Micro-entreprise",
+  logo_url: "",
+  brand_color: "#7c3aed",
 };
 
 const DEFAULT_LEGAL: InvoiceLegal = {
   tva_mention: "TVA non applicable, article 293 B du Code Général des Impôts",
   penalty_clause: "En cas de retard de paiement, une pénalité de 3 fois le taux d'intérêt légal sera appliquée, ainsi qu'une indemnité forfaitaire de 40€ pour frais de recouvrement.",
-  custom_footer: "",
-  default_payment_terms: "Paiement à réception de facture",
-  default_validity_days: 30,
+  custom_footer: "AS C&D — Rodez, France",
+  default_payment_terms: "50% à la commande, 50% à la livraison",
+  default_validity_days: 15,
 };
 
-const CATEGORIES = ["Site web", "SEO", "Maintenance", "Design", "Automatisation", "Autre"];
+const CATEGORIES = ["Site web", "SEO", "Maintenance", "Design", "Automatisation", "Copywriting", "Autre"];
 
 const AdminInvoiceSettingsTab = () => {
   const [company, setCompany] = useState<CompanyInfo>(DEFAULT_COMPANY);
   const [legal, setLegal] = useState<InvoiceLegal>(DEFAULT_LEGAL);
   const [services, setServices] = useState<ServiceItem[]>([]);
   const [saving, setSaving] = useState(false);
-  const [activeSection, setActiveSection] = useState<"company" | "legal" | "catalog">("company");
+  const [activeSection, setActiveSection] = useState<"identity" | "company" | "legal" | "catalog">("identity");
+  const [uploading, setUploading] = useState(false);
 
-  // New service form
   const [newService, setNewService] = useState<Omit<ServiceItem, "id">>({
     name: "", description: "", unit_price: 0, category: "Site web"
   });
@@ -82,14 +86,34 @@ const AdminInvoiceSettingsTab = () => {
     load();
   }, []);
 
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { toast.error("Fichier image requis (PNG, JPG)"); return; }
+    if (file.size > 2 * 1024 * 1024) { toast.error("Fichier trop volumineux (max 2 Mo)"); return; }
+
+    setUploading(true);
+    const ext = file.name.split(".").pop();
+    const path = `logo.${ext}`;
+
+    const { error } = await supabase.storage.from("company-assets").upload(path, file, { upsert: true });
+    if (error) {
+      toast.error("Erreur upload : " + error.message);
+      setUploading(false);
+      return;
+    }
+
+    const { data: urlData } = supabase.storage.from("company-assets").getPublicUrl(path);
+    const logoUrl = urlData.publicUrl + "?t=" + Date.now();
+    setCompany(prev => ({ ...prev, logo_url: logoUrl }));
+    setUploading(false);
+    toast.success("Logo uploadé ✅");
+  };
+
   const saveAll = async () => {
     setSaving(true);
     const upsert = async (key: string, value: any) => {
-      const { data: existing } = await supabase
-        .from("admin_settings")
-        .select("id")
-        .eq("key", key)
-        .maybeSingle();
+      const { data: existing } = await supabase.from("admin_settings").select("id").eq("key", key).maybeSingle();
       if (existing) {
         await supabase.from("admin_settings").update({ value, updated_at: new Date().toISOString() } as any).eq("key", key);
       } else {
@@ -117,6 +141,7 @@ const AdminInvoiceSettingsTab = () => {
   };
 
   const tabs = [
+    { id: "identity" as const, label: "Identité visuelle", icon: Image },
     { id: "company" as const, label: "Entreprise", icon: Building2 },
     { id: "legal" as const, label: "Mentions légales", icon: FileText },
     { id: "catalog" as const, label: "Catalogue services", icon: Package },
@@ -124,23 +149,84 @@ const AdminInvoiceSettingsTab = () => {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      {/* Section tabs */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         {tabs.map(t => (
-          <button
-            key={t.id}
-            onClick={() => setActiveSection(t.id)}
+          <button key={t.id} onClick={() => setActiveSection(t.id)}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
-              activeSection === t.id
-                ? "bg-primary/10 text-primary shadow-sm"
-                : "bg-secondary/50 text-muted-foreground hover:text-foreground hover:bg-secondary"
-            }`}
-          >
-            <t.icon className="size-4" />
-            {t.label}
+              activeSection === t.id ? "bg-primary/10 text-primary shadow-sm" : "bg-secondary/50 text-muted-foreground hover:text-foreground hover:bg-secondary"
+            }`}>
+            <t.icon className="size-4" />{t.label}
           </button>
         ))}
       </div>
+
+      {/* Visual identity */}
+      {activeSection === "identity" && (
+        <div className="card-surface p-6 space-y-5">
+          <div>
+            <h3 className="text-sm font-bold mb-1">Identité visuelle des documents</h3>
+            <p className="text-xs text-muted-foreground">Logo et couleur utilisés sur vos devis et factures PDF.</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="space-y-3">
+              <Label className="text-xs">Logo entreprise (PNG/JPG, max 2 Mo)</Label>
+              <div className="flex items-center gap-4">
+                {company.logo_url ? (
+                  <div className="w-24 h-24 rounded-xl border border-border/30 bg-white flex items-center justify-center overflow-hidden">
+                    <img src={company.logo_url} alt="Logo" className="max-w-full max-h-full object-contain" />
+                  </div>
+                ) : (
+                  <div className="w-24 h-24 rounded-xl border-2 border-dashed border-border/40 flex items-center justify-center">
+                    <Upload className="size-6 text-muted-foreground/40" />
+                  </div>
+                )}
+                <div>
+                  <label className="cursor-pointer">
+                    <input type="file" accept="image/png,image/jpeg,image/jpg" onChange={handleLogoUpload} className="hidden" />
+                    <Button variant="outline" size="sm" disabled={uploading} asChild>
+                      <span>{uploading ? "Upload..." : company.logo_url ? "Remplacer" : "Uploader"}</span>
+                    </Button>
+                  </label>
+                  {company.logo_url && (
+                    <Button variant="ghost" size="sm" className="text-destructive ml-2" onClick={() => setCompany({ ...company, logo_url: "" })}>
+                      Supprimer
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <Label className="text-xs">Couleur principale du document</Label>
+              <div className="flex items-center gap-3">
+                <input type="color" value={company.brand_color} onChange={e => setCompany({ ...company, brand_color: e.target.value })}
+                  className="w-12 h-10 rounded-lg border border-border/30 cursor-pointer" />
+                <Input value={company.brand_color} onChange={e => setCompany({ ...company, brand_color: e.target.value })} className="w-32" placeholder="#7c3aed" />
+                <div className="w-24 h-10 rounded-lg" style={{ backgroundColor: company.brand_color }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Preview */}
+          <div className="border border-border/20 rounded-xl p-6 bg-white">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-3">Aperçu en-tête</p>
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                {company.logo_url && <img src={company.logo_url} alt="" className="w-12 h-12 object-contain" />}
+                <div>
+                  <p className="text-lg font-bold text-slate-900">{company.name}</p>
+                  <p className="text-sm font-medium" style={{ color: company.brand_color }}>{company.subtitle}</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-2xl font-extrabold" style={{ color: company.brand_color }}>DEVIS</p>
+                <p className="text-xs text-slate-500 mt-1">DEV-2026-0001</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Company info */}
       {activeSection === "company" && (
@@ -155,7 +241,7 @@ const AdminInvoiceSettingsTab = () => {
               <Input value={company.name} onChange={e => setCompany({ ...company, name: e.target.value })} />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs">Sous-titre</Label>
+              <Label className="text-xs">Sous-titre / Activité</Label>
               <Input value={company.subtitle} onChange={e => setCompany({ ...company, subtitle: e.target.value })} />
             </div>
             <div className="space-y-1.5">
@@ -211,8 +297,8 @@ const AdminInvoiceSettingsTab = () => {
               <Input type="number" value={legal.default_validity_days} onChange={e => setLegal({ ...legal, default_validity_days: Number(e.target.value) })} className="w-32" />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs">Pied de page personnalisé (optionnel)</Label>
-              <Textarea value={legal.custom_footer} onChange={e => setLegal({ ...legal, custom_footer: e.target.value })} rows={2} placeholder="Texte libre affiché en bas du document..." />
+              <Label className="text-xs">Pied de page personnalisé</Label>
+              <Textarea value={legal.custom_footer} onChange={e => setLegal({ ...legal, custom_footer: e.target.value })} rows={2} placeholder="AS C&D — Rodez, France" />
             </div>
           </div>
         </div>
@@ -224,10 +310,8 @@ const AdminInvoiceSettingsTab = () => {
           <div className="card-surface p-6">
             <div className="mb-4">
               <h3 className="text-sm font-bold mb-1">Catalogue de services</h3>
-              <p className="text-xs text-muted-foreground">Services pré-définis pour remplir rapidement vos devis. Cliquez sur un service lors de la création d'un devis pour l'ajouter automatiquement.</p>
+              <p className="text-xs text-muted-foreground">Services pré-définis pour remplir rapidement vos devis.</p>
             </div>
-
-            {/* Add new service */}
             <div className="bg-secondary/30 rounded-xl p-4 border border-border/20 mb-4">
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Ajouter un service</p>
               <div className="grid grid-cols-2 gap-3 mb-3">
@@ -243,10 +327,8 @@ const AdminInvoiceSettingsTab = () => {
               </div>
               <Button size="sm" onClick={addService}><Plus className="size-3.5 mr-1.5" />Ajouter au catalogue</Button>
             </div>
-
-            {/* Existing services */}
             {services.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">Aucun service dans le catalogue. Ajoutez vos prestations ci-dessus.</p>
+              <p className="text-sm text-muted-foreground text-center py-8">Aucun service dans le catalogue.</p>
             ) : (
               <div className="space-y-2">
                 {CATEGORIES.filter(cat => services.some(s => s.category === cat)).map(cat => (
@@ -273,7 +355,6 @@ const AdminInvoiceSettingsTab = () => {
         </div>
       )}
 
-      {/* Save button */}
       <div className="flex justify-end">
         <Button onClick={saveAll} disabled={saving} className="min-w-[200px]">
           <Save className="size-4 mr-2" />{saving ? "Sauvegarde..." : "Sauvegarder tout"}
