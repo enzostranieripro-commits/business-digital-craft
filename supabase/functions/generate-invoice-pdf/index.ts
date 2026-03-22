@@ -13,7 +13,7 @@ serve(async (req) => {
     const { invoice, items, companyInfo, invoiceLegal } = await req.json();
 
     const company = {
-      name: companyInfo?.name || "AS C&D",
+      name: companyInfo?.name || "ASC&D",
       subtitle: companyInfo?.subtitle || "Création de sites web & Copywriting",
       siret: companyInfo?.siret || "",
       address: companyInfo?.address || "Rodez, France",
