@@ -28,7 +28,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between">
         <a href="#" className="flex items-center gap-2">
           <span className="font-display text-lg font-extrabold tracking-tight text-foreground">
-            Angelot & Stranieri<span className="text-primary"> Consulting</span>
+            ASC<span className="text-primary">&D</span>
           </span>
           <span className="w-2 h-2 rounded-full bg-primary animate-pulse-dot" />
         </a>

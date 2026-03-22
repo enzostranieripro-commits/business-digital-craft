@@ -13,8 +13,8 @@ serve(async (req) => {
     const { invoice, items, companyInfo, invoiceLegal } = await req.json();
 
     const company = {
-      name: companyInfo?.name || "AS C&D",
-      subtitle: companyInfo?.subtitle || "Création de sites web & Copywriting",
+      name: companyInfo?.name || "ASC&D",
+      subtitle: companyInfo?.subtitle || "Angelot Stranieri Consulting & Development",
       siret: companyInfo?.siret || "",
       address: companyInfo?.address || "Rodez, France",
       email: companyInfo?.email || "contact@ascnd.fr",
@@ -28,7 +28,7 @@ serve(async (req) => {
     const legal = {
       tva_mention: invoiceLegal?.tva_mention || "TVA non applicable, article 293 B du Code Général des Impôts",
       penalty_clause: invoiceLegal?.penalty_clause || "En cas de retard de paiement, une pénalité de 3 fois le taux d'intérêt légal sera appliquée, ainsi qu'une indemnité forfaitaire de 40€ pour frais de recouvrement.",
-      custom_footer: invoiceLegal?.custom_footer || "AS C&D — Rodez, France",
+      custom_footer: invoiceLegal?.custom_footer || "ASC&D — Rodez, France",
       default_payment_terms: invoiceLegal?.default_payment_terms || "50% à la commande, 50% à la livraison",
       default_validity_days: invoiceLegal?.default_validity_days || 15,
     };
