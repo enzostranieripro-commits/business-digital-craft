@@ -14,7 +14,7 @@ serve(async (req) => {
 
     const company = {
       name: companyInfo?.name || "ASC&D",
-      subtitle: companyInfo?.subtitle || "Création de sites web & Copywriting",
+      subtitle: companyInfo?.subtitle || "Angelot Stranieri Consulting & Development",
       siret: companyInfo?.siret || "",
       address: companyInfo?.address || "Rodez, France",
       email: companyInfo?.email || "contact@ascnd.fr",
