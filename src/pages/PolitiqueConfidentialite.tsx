@@ -5,9 +5,9 @@ import { Helmet } from "react-helmet-async";
 const PolitiqueConfidentialite = () => (
   <div className="min-h-screen bg-background text-foreground">
     <Helmet>
-      <title>Politique de confidentialité — Angelot & Stranieri Consulting</title>
-      <meta name="description" content="Politique de confidentialité et protection des données personnelles (RGPD) du site asconsulting.fr." />
-      <link rel="canonical" href="https://asconsulting.fr/politique-confidentialite" />
+      <title>Politique de confidentialité — ASC&D</title>
+      <meta name="description" content="Politique de confidentialité et protection des données personnelles (RGPD) du site ascnd.fr." />
+      <link rel="canonical" href="https://ascnd.fr/politique-confidentialite" />
     </Helmet>
     <div className="max-w-3xl mx-auto px-4 py-16">
       <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors">
@@ -20,9 +20,9 @@ const PolitiqueConfidentialite = () => (
         <h2>1. Responsable du traitement</h2>
         <p>
           Le responsable du traitement des données personnelles est :<br />
-          <strong>Angelot & Stranieri Consulting</strong><br />
+          <strong>ASC&D — Angelot Stranieri Consulting & Development</strong><br />
           Siège social : Rodez, 12000 Aveyron, France<br />
-          Email : contact@asconsulting.fr
+          Email : contact@ascnd.fr
         </p>
 
         <h2>2. Données collectées</h2>
@@ -62,7 +62,7 @@ const PolitiqueConfidentialite = () => (
 
         <h2>6. Destinataires des données</h2>
         <p>
-          Les données sont accessibles uniquement aux membres de Angelot & Stranieri Consulting dans le
+          Les données sont accessibles uniquement aux membres d'ASC&D dans le
           cadre de leurs fonctions. Elles ne sont ni vendues, ni louées, ni cédées à des tiers.
         </p>
         <p>
@@ -84,7 +84,7 @@ const PolitiqueConfidentialite = () => (
           <li><strong>Droit d'opposition</strong> : vous opposer au traitement pour motif légitime</li>
         </ul>
         <p>
-          Pour exercer ces droits, envoyez un email à <strong>contact@asconsulting.fr</strong> accompagné
+          Pour exercer ces droits, envoyez un email à <strong>contact@ascnd.fr</strong> accompagné
           d'une copie de votre pièce d'identité. Nous répondrons dans un délai de 30 jours.
         </p>
 

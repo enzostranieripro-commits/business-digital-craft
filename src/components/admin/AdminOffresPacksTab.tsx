@@ -27,7 +27,7 @@ const DEFAULT_PACKS: Pack[] = [
     description: "Site vitrine clé en main pour lancer votre présence en ligne.",
     includes: [
       "Site vitrine 4 à 5 pages",
-      "Copywriting complet (tous les textes rédigés par AS C&D)",
+      "Copywriting complet (tous les textes rédigés par ASC&D)",
       "Design responsive (mobile + desktop)",
       "Formulaire de contact",
       "SEO on-page de base (balises, titres, méta-descriptions)",

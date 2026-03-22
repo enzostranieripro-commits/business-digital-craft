@@ -5,9 +5,9 @@ import { Helmet } from "react-helmet-async";
 const MentionsLegales = () => (
   <div className="min-h-screen bg-background text-foreground">
     <Helmet>
-      <title>Mentions légales — Angelot & Stranieri Consulting</title>
-      <meta name="description" content="Mentions légales du site asconsulting.fr — Angelot & Stranieri Consulting, agence web à Rodez, Aveyron." />
-      <link rel="canonical" href="https://asconsulting.fr/mentions-legales" />
+      <title>Mentions légales — ASC&D</title>
+      <meta name="description" content="Mentions légales du site ascnd.fr — ASC&D (Angelot Stranieri Consulting & Development), agence web à Rodez, Aveyron." />
+      <link rel="canonical" href="https://ascnd.fr/mentions-legales" />
     </Helmet>
     <div className="max-w-3xl mx-auto px-4 py-16">
       <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors">
@@ -19,12 +19,11 @@ const MentionsLegales = () => (
 
         <h2>1. Éditeur du site</h2>
         <p>
-          Le site <strong>asconsulting.fr</strong> est édité par :<br />
-          <strong>Angelot & Stranieri Consulting</strong><br />
+          Le site <strong>ascnd.fr</strong> est édité par :<br />
+          <strong>ASC&D — Angelot Stranieri Consulting & Development</strong><br />
           Micro-entreprise — SIRET : [à compléter]<br />
           Siège social : Rodez, 12000 Aveyron, France<br />
-          Téléphone : 05 65 00 00 00<br />
-          Email : contact@asconsulting.fr<br />
+          Email : contact@ascnd.fr<br />
           Directeur de la publication : [Nom du gérant]
         </p>
         <p>TVA non applicable, article 293 B du CGI.</p>
@@ -47,14 +46,14 @@ const MentionsLegales = () => (
 
         <h2>4. Limitation de responsabilité</h2>
         <p>
-          Angelot & Stranieri Consulting ne pourra être tenue responsable des dommages directs et indirects causés au
-          matériel de l'utilisateur lors de l'accès au site. Angelot & Stranieri Consulting décline toute responsabilité
+          ASC&D ne pourra être tenue responsable des dommages directs et indirects causés au
+          matériel de l'utilisateur lors de l'accès au site. ASC&D décline toute responsabilité
           quant à l'utilisation qui pourrait être faite des informations et contenus présents sur le site.
         </p>
 
         <h2>5. Liens hypertextes</h2>
         <p>
-          Le site peut contenir des liens hypertextes vers d'autres sites. Angelot & Stranieri Consulting n'exerce
+          Le site peut contenir des liens hypertextes vers d'autres sites. ASC&D n'exerce
           aucun contrôle sur ces sites et décline toute responsabilité quant à leur contenu.
         </p>
 

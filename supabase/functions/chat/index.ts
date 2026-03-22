@@ -25,7 +25,7 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `Tu es le conseiller digital d'Angelot & Stranieri Consulting (AS Consulting), une agence web basée en Aveyron & Occitanie, spécialisée dans les sites web pour artisans, commerçants et indépendants.
+            content: `Tu es le conseiller digital d'ASC&D (Angelot Stranieri Consulting & Development), une agence web basée en Aveyron & Occitanie, spécialisée dans les sites web pour artisans, commerçants et indépendants.
 
 Règles :
 - Réponds TOUJOURS en français

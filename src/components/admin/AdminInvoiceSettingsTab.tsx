@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Save, Plus, Trash2, Building2, FileText, Package, GripVertical, Upload, Image } from "lucide-react";
+import { Save, Plus, Trash2, Building2, FileText, Package, GripVertical, Upload, Image, CreditCard } from "lucide-react";
 
 interface CompanyInfo {
   name: string;
@@ -18,6 +18,9 @@ interface CompanyInfo {
   legal_form: string;
   logo_url: string;
   brand_color: string;
+  iban: string;
+  bic: string;
+  bank_name: string;
 }
 
 interface ServiceItem {
@@ -34,11 +37,13 @@ interface InvoiceLegal {
   custom_footer: string;
   default_payment_terms: string;
   default_validity_days: number;
+  default_due_days: number;
+  acompte_percent: number;
 }
 
 const DEFAULT_COMPANY: CompanyInfo = {
-  name: "AS C&D",
-  subtitle: "Création de sites web & Copywriting",
+  name: "ASC&D",
+  subtitle: "Angelot Stranieri Consulting & Development",
   siret: "",
   address: "Rodez, France",
   email: "contact@ascnd.fr",
@@ -47,14 +52,19 @@ const DEFAULT_COMPANY: CompanyInfo = {
   legal_form: "Micro-entreprise",
   logo_url: "",
   brand_color: "#7c3aed",
+  iban: "",
+  bic: "",
+  bank_name: "",
 };
 
 const DEFAULT_LEGAL: InvoiceLegal = {
   tva_mention: "TVA non applicable, article 293 B du Code Général des Impôts",
   penalty_clause: "En cas de retard de paiement, une pénalité de 3 fois le taux d'intérêt légal sera appliquée, ainsi qu'une indemnité forfaitaire de 40€ pour frais de recouvrement.",
-  custom_footer: "AS C&D — Rodez, France",
+  custom_footer: "ASC&D — Rodez, France",
   default_payment_terms: "50% à la commande, 50% à la livraison",
   default_validity_days: 15,
+  default_due_days: 30,
+  acompte_percent: 50,
 };
 
 const CATEGORIES = ["Site web", "SEO", "Maintenance", "Design", "Automatisation", "Copywriting", "Autre"];
@@ -64,7 +74,7 @@ const AdminInvoiceSettingsTab = () => {
   const [legal, setLegal] = useState<InvoiceLegal>(DEFAULT_LEGAL);
   const [services, setServices] = useState<ServiceItem[]>([]);
   const [saving, setSaving] = useState(false);
-  const [activeSection, setActiveSection] = useState<"identity" | "company" | "legal" | "catalog">("identity");
+  const [activeSection, setActiveSection] = useState<"identity" | "company" | "bank" | "legal" | "catalog">("identity");
   const [uploading, setUploading] = useState(false);
 
   const [newService, setNewService] = useState<Omit<ServiceItem, "id">>({
@@ -143,6 +153,7 @@ const AdminInvoiceSettingsTab = () => {
   const tabs = [
     { id: "identity" as const, label: "Identité visuelle", icon: Image },
     { id: "company" as const, label: "Entreprise", icon: Building2 },
+    { id: "bank" as const, label: "Coordonnées bancaires", icon: CreditCard },
     { id: "legal" as const, label: "Mentions légales", icon: FileText },
     { id: "catalog" as const, label: "Catalogue services", icon: Package },
   ];
@@ -272,6 +283,30 @@ const AdminInvoiceSettingsTab = () => {
         </div>
       )}
 
+      {/* Bank info */}
+      {activeSection === "bank" && (
+        <div className="card-surface p-6 space-y-5">
+          <div>
+            <h3 className="text-sm font-bold mb-1">Coordonnées bancaires</h3>
+            <p className="text-xs text-muted-foreground">Informations affichées sur les factures pour le règlement par virement.</p>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5 col-span-2">
+              <Label className="text-xs">IBAN</Label>
+              <Input value={company.iban} onChange={e => setCompany({ ...company, iban: e.target.value })} placeholder="FR76 XXXX XXXX XXXX XXXX XXXX XXX" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">BIC / SWIFT</Label>
+              <Input value={company.bic} onChange={e => setCompany({ ...company, bic: e.target.value })} placeholder="XXXXXXXX" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Nom de la banque</Label>
+              <Input value={company.bank_name} onChange={e => setCompany({ ...company, bank_name: e.target.value })} placeholder="Ex: Crédit Agricole" />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Legal mentions */}
       {activeSection === "legal" && (
         <div className="card-surface p-6 space-y-5">
@@ -292,13 +327,23 @@ const AdminInvoiceSettingsTab = () => {
               <Label className="text-xs">Conditions de paiement par défaut</Label>
               <Input value={legal.default_payment_terms} onChange={e => setLegal({ ...legal, default_payment_terms: e.target.value })} />
             </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs">Validité des devis (jours)</Label>
-              <Input type="number" value={legal.default_validity_days} onChange={e => setLegal({ ...legal, default_validity_days: Number(e.target.value) })} className="w-32" />
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-1.5">
+                <Label className="text-xs">Validité des devis (jours)</Label>
+                <Input type="number" value={legal.default_validity_days} onChange={e => setLegal({ ...legal, default_validity_days: Number(e.target.value) })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Échéance facture (jours)</Label>
+                <Input type="number" value={legal.default_due_days} onChange={e => setLegal({ ...legal, default_due_days: Number(e.target.value) })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Acompte par défaut (%)</Label>
+                <Input type="number" value={legal.acompte_percent} onChange={e => setLegal({ ...legal, acompte_percent: Number(e.target.value) })} />
+              </div>
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs">Pied de page personnalisé</Label>
-              <Textarea value={legal.custom_footer} onChange={e => setLegal({ ...legal, custom_footer: e.target.value })} rows={2} placeholder="AS C&D — Rodez, France" />
+              <Textarea value={legal.custom_footer} onChange={e => setLegal({ ...legal, custom_footer: e.target.value })} rows={2} placeholder="ASC&D — Rodez, France" />
             </div>
           </div>
         </div>
